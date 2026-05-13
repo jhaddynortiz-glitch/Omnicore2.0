@@ -1,0 +1,47 @@
+<div class="chat-container flex h-full surface-card border-round-2xl shadow-2 overflow-hidden border-1 surface-border">
+    
+    <!-- Columna Izquierda: Listado de Chats -->
+    <app-chat-list 
+        [class.hidden]="isMobile() && !!selectedContact()"
+        class="flex-shrink-0 w-full md:w-25rem h-full border-right-1 surface-border"
+        [contacts]="contacts()"
+        [selectedContactId]="selectedContact()?.id"
+        [isContactSelected]="!!selectedContact()"
+        [isLoading]="isLoading()"
+        (contactSelected)="selectContact($event)"
+        (addContact)="openAddContactDialog()">
+    </app-chat-list>
+
+    <!-- Columna Derecha: Lienzo de Conversación activa -->
+    <div [class.hidden]="isMobile() && !selectedContact()"
+         class="flex-auto flex flex-column h-full overflow-hidden">
+        <app-chat-window
+            [selectedContact]="selectedContact()"
+            [activeMessages]="activeMessages()"
+            [isLoadingMessages]="isLoadingMessages()"
+            [isLoadingMore]="isLoadingMore()"
+            [menuItems]="chatMenuItems()"
+            (backToList)="goBackToList()"
+            (loadMore)="loadMoreMessages()">
+        </app-chat-window>
+
+        <!-- Barra inferior para Enviar Nuevo Mensaje -->
+        @if (selectedContact()) {
+            <app-message-input
+                (messageSent)="sendMessage($event)"
+                (imageSent)="sendImage($event)">
+            </app-message-input>
+        }
+    </div>
+
+    <!-- Diálogo para Gestión de Contactos -->
+    <app-contact-dialog
+        [(visible)]="showAddContactDialog"
+        [(contactName)]="newContactName"
+        [(contactPhone)]="newContactPhone"
+        [isEditing]="isEditingContact()"
+        [isSaving]="isSavingContact()"
+        (save)="saveContact()">
+    </app-contact-dialog>
+
+</div>

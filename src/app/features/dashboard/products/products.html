@@ -1,0 +1,276 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="catalog-container p-4">
+    <div class="header-section flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="title">Administración de Catálogo</h1>
+            <p class="subtitle">Organiza tus productos en categorías y subcategorías para la IA.</p>
+        </div>
+    </div>
+
+    <p-tabs [value]="activeTab().toString()" (valueChange)="$event !== null && $event !== undefined && activeTab.set(+$event)">
+        <p-tablist>
+            <p-tab value="0">
+                <i class="pi pi-shopping-bag mr-2"></i>
+                <span>Productos</span>
+            </p-tab>
+            <p-tab value="1">
+                <i class="pi pi-tags mr-2"></i>
+                <span>Categorías</span>
+            </p-tab>
+            <p-tab value="2">
+                <i class="pi pi-list mr-2"></i>
+                <span>Subcategorías</span>
+            </p-tab>
+        </p-tablist>
+
+        <p-tabpanels>
+            <!-- PESTAÑA: PRODUCTOS -->
+            <p-tabpanel value="0">
+                <div class="filters-bar flex flex-wrap gap-3 mb-4 p-4 shadow-2 surface-card border-round-xl border-1 surface-border align-items-center">
+                    <div class="flex-grow-1 min-w-min">
+                        <span class="p-input-icon-left w-full">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text" [(ngModel)]="searchQuery" (input)="loadProducts()" 
+                                placeholder="Buscar por nombre..." class="w-full border-round-lg" />
+                        </span>
+                    </div>
+                    <p-select [options]="categories()" [(ngModel)]="filterCategory" (onChange)="onFilterCategoryChange()" 
+                        optionLabel="name" optionValue="id" placeholder="Todas las Categorías" 
+                        [showClear]="true" styleClass="w-full md:w-15rem border-round-lg"></p-select>
+                    
+                    <p-select [options]="productsFilterSubcategories()" [(ngModel)]="filterSubcategory" (onChange)="loadProducts()" 
+                        optionLabel="name" optionValue="id" placeholder="Todas las Subcategorías" 
+                        [showClear]="true" styleClass="w-full md:w-15rem border-round-lg"></p-select>
+
+                    <button pButton icon="pi pi-plus" label="Nuevo Producto" (click)="openNewProduct()" 
+                        class="p-button-rounded gradient-btn px-4 shadow-2"></button>
+                </div>
+
+                <div class="content-card surface-card p-4 shadow-2 border-round-xl border-1 surface-border">
+                    <p-table [value]="products()" [loading]="loading()" [tableStyle]="{'min-width': '100%'}" styleClass="p-datatable-sm">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th class="py-3 px-2 text-center" style="width: 80px">Imagen</th>
+                                <th class="py-3 px-2">Nombre</th>
+                                <th class="py-3 px-2" style="width: 25%">Descripción</th>
+                                <th class="py-3 px-2">Jerarquía</th>
+                                <th class="py-3 px-2">Precio</th>
+                                <th class="py-3 px-2">Stock</th>
+                                <th class="py-3 px-2 text-center">Estado</th>
+                                <th class="py-3 px-2 text-center">Acciones</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-product>
+                            <tr class="hover:surface-hover transition-colors">
+                                <td class="py-3 px-2 text-center">
+                                    @if (product.imageUrl) {
+                                        <img [src]="product.imageUrl" [alt]="product.name" class="w-3rem h-3rem border-round-lg shadow-1" style="object-fit: cover;" />
+                                    } @else {
+                                        <div class="w-3rem h-3rem border-round-lg surface-100 flex align-items-center justify-content-center text-400">
+                                            <i class="pi pi-image text-xl"></i>
+                                        </div>
+                                    }
+                                </td>
+                                <td class="py-3 px-2">
+                                    <span class="font-bold block text-900">{{product.name}}</span>
+                                </td>
+                                <td class="py-3 px-2">
+                                    <span class="text-clamp-2 text-sm text-700">{{product.description || 'Sin descripción'}}</span>
+                                </td>
+                                <td class="py-3 px-2">
+                                    <div class="flex flex-column gap-1">
+                                        <span class="text-xs font-bold text-primary uppercase letter-spacing-1">{{product.Subcategory?.Category?.name || 'Global'}}</span>
+                                        <span class="text-sm font-medium text-700">{{product.Subcategory?.name || 'Sin subcategoría'}}</span>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-2">
+                                    <span class="price-tag">{{product.price}} {{product.currency}}</span>
+                                </td>
+                                <td class="py-3 px-2">
+                                    <div class="stock-indicator" [class]="product.stock > 10 ? 'text-green-500' : 'text-red-400'">
+                                        <i class="pi" [class]="product.stock > 10 ? 'pi-check-circle' : 'pi-exclamation-triangle'"></i>
+                                        <span class="font-bold">{{product.stock}}</span>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-2 text-center">
+                                    <p-toggleswitch [(ngModel)]="product.isActive" (onChange)="toggleProductStatus(product)"></p-toggleswitch>
+                                </td>
+                                <td class="py-3 px-2 text-center">
+                                    <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-text" (click)="editProduct(product)"></button>
+                                    <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" (click)="deleteProduct(product)"></button>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </p-tabpanel>
+
+            <!-- PESTAÑA: CATEGORÍAS -->
+            <p-tabpanel value="1">
+                <div class="filters-bar flex flex-wrap justify-content-between gap-3 mb-4 p-4 shadow-2 align-items-center surface-card border-round-xl border-1 surface-border">
+                    <div class="flex-grow-1 min-w-min max-w-20rem">
+                        <span class="p-input-icon-left w-full">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text" [(ngModel)]="categorySearchQuery" 
+                                placeholder="Buscar categoría..." class="w-full border-round-lg" />
+                        </span>
+                    </div>
+                    <button pButton icon="pi pi-plus" label="Nueva Categoría" (click)="openNewCategory()" class="p-button-rounded gradient-btn px-4 shadow-2 ml-auto"></button>
+                </div>
+                <div class="content-card surface-card p-4 shadow-2 border-round-xl border-1 surface-border">
+                    <p-table [value]="filteredCategoriesList()" [tableStyle]="{'min-width': '100%'}" styleClass="p-datatable-sm">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th class="py-3 px-4">Nombre de Categoría</th>
+                                <th class="py-3 px-4 text-center">Acciones</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-cat>
+                            <tr class="hover:surface-hover transition-colors">
+                                <td class="py-3 px-4">
+                                    <span class="text-900">{{cat.name}}</span>
+                                </td>
+                                <td class="py-3 px-4 text-center">
+                                    <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-text" (click)="editCategory(cat)"></button>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </p-tabpanel>
+
+            <!-- PESTAÑA: SUBCATEGORÍAS -->
+            <p-tabpanel value="2">
+                <div class="filters-bar flex flex-wrap justify-content-between gap-3 mb-4 p-4 shadow-2 align-items-center surface-card border-round-xl border-1 surface-border">
+                    <div class="flex flex-wrap gap-3 flex-grow-1 min-w-min">
+                        <div class="max-w-20rem w-full">
+                            <span class="p-input-icon-left w-full">
+                                <i class="pi pi-search"></i>
+                                <input pInputText type="text" [(ngModel)]="subcategorySearchQuery" 
+                                    placeholder="Buscar subcategoría..." class="w-full border-round-lg" />
+                            </span>
+                        </div>
+                        <p-select [options]="categories()" [(ngModel)]="subcategoryFilterCategory" 
+                            optionLabel="name" optionValue="id" placeholder="Todas las Categorías" 
+                            [showClear]="true" styleClass="w-full md:w-15rem border-round-lg"></p-select>
+                    </div>
+                    <button pButton icon="pi pi-plus" label="Nueva Subcategoría" (click)="openNewSubcategory()" class="p-button-rounded gradient-btn px-4 shadow-2 ml-auto"></button>
+                </div>
+                <div class="content-card surface-card p-4 shadow-2 border-round-xl border-1 surface-border">
+                    <p-table [value]="filteredSubcategoriesList()" [tableStyle]="{'min-width': '100%'}" styleClass="p-datatable-sm">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th class="py-3 px-4">Subcategoría</th>
+                                <th class="py-3 px-4">Categoría Padre</th>
+                                <th class="py-3 px-4 text-center">Acciones</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-sub>
+                            <tr class="hover:surface-hover transition-colors">
+                                <td class="py-3 px-4">
+                                    <span class="text-900">{{sub.name}}</span>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <span class="p-tag p-tag-rounded p-tag-info px-3">{{sub.Category?.name}}</span>
+                                </td>
+                                <td class="py-3 px-4 text-center">
+                                    <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-text" (click)="editSubcategory(sub)"></button>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </p-tabpanel>
+        </p-tabpanels>
+    </p-tabs>
+</div>
+
+<!-- MODALES (Sin cambios estructurales) -->
+<p-dialog [(visible)]="showProductDialog" [modal]="true" header="Gestión de Producto" [style]="{width: '600px'}" styleClass="glass-modal">
+    <div [formGroup]="productForm" class="p-fluid grid pt-3">
+        <!-- Sección de Imagen -->
+        <div class="col-12 field mb-4 flex flex-column align-items-center gap-3">
+            <label class="font-bold block w-full text-left">Imagen del Producto</label>
+            <div class="relative w-10rem h-10rem border-round-xl border-1 surface-border surface-card flex align-items-center justify-content-center overflow-hidden shadow-2">
+                @if (productForm.get('imageUrl')?.value) {
+                    <img [src]="productForm.get('imageUrl')?.value" class="w-full h-full" style="object-fit: cover;" />
+                    <button pButton icon="pi pi-times" 
+                        class="p-button-rounded p-button-danger p-button-sm absolute shadow-2" 
+                        style="top: 0.5rem; right: 0.5rem; width: 2rem; height: 2rem;"
+                        (click)="removeProductImage()"
+                        pTooltip="Eliminar imagen"></button>
+                } @else if (isUploadingImage()) {
+                    <i class="pi pi-spin pi-spinner text-4xl text-primary"></i>
+                } @else {
+                    <div class="text-center p-3 cursor-pointer hover:surface-hover w-full h-full flex flex-column align-items-center justify-content-center transition-colors"
+                         (click)="fileInput.click()">
+                        <i class="pi pi-camera text-4xl text-400 mb-2"></i>
+                        <span class="text-sm text-500">Subir foto</span>
+                    </div>
+                }
+            </div>
+            <input type="file" #fileInput (change)="onProductImageSelected($event)" accept="image/*" style="display: none;" />
+            <small class="text-500">Formato recomendado: Cuadrado (JPG, PNG)</small>
+        </div>
+
+        <div class="col-12 field mb-4">
+            <label class="font-bold mb-2 block">Nombre del Producto*</label>
+            <input pInputText formControlName="name" class="p-inputtext-lg" />
+        </div>
+        <div class="col-12 md:col-6 field mb-4">
+            <label class="font-bold mb-2 block">Categoría</label>
+            <p-select [options]="categories()" formControlName="categoryId" optionLabel="name" optionValue="id" placeholder="Seleccionar..."></p-select>
+        </div>
+        <div class="col-12 md:col-6 field mb-4">
+            <label class="font-bold mb-2 block">Subcategoría*</label>
+            <p-select [options]="modalFilteredSubcategories()" formControlName="subcategoryId" optionLabel="name" optionValue="id" 
+                placeholder="Seleccionar..." [disabled]="!productForm.get('categoryId')?.value"></p-select>
+        </div>
+        <div class="col-12 field mb-4">
+            <label class="font-bold mb-2 block">Descripción</label>
+            <textarea pTextarea formControlName="description" rows="3"></textarea>
+        </div>
+        <div class="col-6 field mb-4">
+            <label class="font-bold mb-2 block">Precio*</label>
+            <p-inputNumber formControlName="price" mode="decimal" [minFractionDigits]="2"></p-inputNumber>
+        </div>
+        <div class="col-6 field mb-4">
+            <label class="font-bold mb-2 block">Stock*</label>
+            <p-inputNumber formControlName="stock" [showButtons]="true"></p-inputNumber>
+        </div>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton label="Cancelar" class="p-button-text" (click)="showProductDialog.set(false)"></button>
+        <button pButton label="Guardar Producto" class="gradient-btn border-round-lg" (click)="saveProduct()" [loading]="saving()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="showCategoryDialog" [modal]="true" header="Categoría" [style]="{width: '400px'}">
+    <div [formGroup]="categoryForm" class="p-fluid pt-3">
+        <div class="field">
+            <label class="font-bold">Nombre</label>
+            <input pInputText formControlName="name" />
+        </div>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton label="Guardar" class="gradient-btn" (click)="saveCategory()" [loading]="saving()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="showSubcategoryDialog" [modal]="true" header="Subcategoría" [style]="{width: '450px'}">
+    <div [formGroup]="subcategoryForm" class="p-fluid pt-3">
+        <div class="field mb-4">
+            <label class="font-bold">Categoría Padre</label>
+            <p-select [options]="categories()" formControlName="categoryId" optionLabel="name" optionValue="id" placeholder="Seleccionar..."></p-select>
+        </div>
+        <div class="field">
+            <label class="font-bold">Nombre de Subcategoría</label>
+            <input pInputText formControlName="name" />
+        </div>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton label="Guardar" class="gradient-btn" (click)="saveSubcategory()" [loading]="saving()"></button>
+    </ng-template>
+</p-dialog>

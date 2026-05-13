@@ -1,0 +1,20 @@
+<div class="min-h-screen flex flex-column relative overflow-hidden surface-ground" style="background-image: radial-gradient(ellipse at top right, color-mix(in srgb, var(--p-primary-500) 15%, transparent) 0%, transparent 40%), radial-gradient(ellipse at bottom left, color-mix(in srgb, var(--p-primary-500) 10%, transparent) 0%, transparent 40%); transition: background-color 0.3s; ">
+    <app-navbar></app-navbar>
+
+    <div class="flex-auto flex align-items-center justify-content-center flex-column px-4 py-8 z-1">
+        <span class="inline-block px-3 py-1 mb-4 text-sm font-semibold border-round-3xl" style="background: color-mix(in srgb, var(--p-primary-500) 10%, transparent); color: var(--p-primary-500);">
+            ✨ Nuevo CRM Escalable
+        </span>
+        <h1 class="text-7xl font-extrabold text-900 text-center mb-4 line-height-2" style="max-width: 800px;">
+            El centro de control para tus <span class="text-primary">negocios</span>
+        </h1>
+        <p class="text-xl text-600 text-center mb-5 line-height-3" style="max-width: 600px;">
+            Una plataforma modular diseñada para crecer junto contigo. Automatiza ventas, fideliza clientes y toma mejores decisiones. Todo en OmniCore.
+        </p>
+        
+        <div class="flex align-items-center gap-3">
+            <p-button label="Comenzar Gratis" size="large" [rounded]="true"></p-button>
+            <p-button label="Agendar una Demo" size="large" severity="secondary" [outlined]="true" [rounded]="true" icon="pi pi-calendar"></p-button>
+        </div>
+    </div>
+</div>

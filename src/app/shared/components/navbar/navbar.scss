@@ -1,0 +1,18 @@
+:host ::ng-deep {
+    .p-menu {
+        .p-menu-item-link {
+            cursor: pointer !important;
+            
+            &:hover {
+                .p-menu-item-text, .p-menu-item-icon {
+                    color: var(--p-primary-500) !important;
+                }
+            }
+        }
+
+        // Asegurar que las etiquetas de grupo no tengan cursor pointer
+        .p-menu-item-label:not(.p-menu-item-link *) {
+            cursor: default;
+        }
+    }
+}

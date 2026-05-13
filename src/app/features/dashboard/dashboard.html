@@ -1,0 +1,38 @@
+<div class="h-screen flex flex-column surface-ground">
+    
+    <!-- Topbar (Navbar 100% full width adaptado) -->
+    <app-navbar layoutStyle="dashboard" (sidebarToggle)="toggleSidebar()"></app-navbar>
+
+    <div class="flex-auto flex overflow-hidden relative">
+        
+        <!-- Mobile Backdrop Overlay -->
+        <div class="sidebar-backdrop" 
+             [ngClass]="{'active': isMobileSidebarOpen}" 
+             (click)="closeMobileSidebar()"></div>
+
+        <!-- Sidebar Menú Lateral -->
+        <div class="sidebar surface-card border-right-1 surface-border flex flex-column py-4 px-2 gap-1 z-1 overflow-hidden"
+             [ngClass]="{
+                'w-5rem': isSidebarCollapsed && !isMobileSidebarOpen,
+                'w-16rem': !isSidebarCollapsed || isMobileSidebarOpen,
+                'mobile-open': isMobileSidebarOpen
+             }">
+            <a *ngFor="let item of filteredMenuItems()" 
+               [routerLink]="item.route" 
+               routerLinkActive="surface-hover text-primary font-bold" 
+               [routerLinkActiveOptions]="item.route === '/dashboard' ? {exact: true} : {exact: false}" 
+               class="flex align-items-center cursor-pointer border-round-lg text-700 hover:surface-hover hover:text-900 transition-colors no-underline"
+               [ngClass]="isSidebarCollapsed && !isMobileSidebarOpen ? 'justify-content-center py-3 px-0' : 'px-3 py-2'"
+               (click)="onMobileNavClick()">
+                <i [class]="item.icon + ' text-lg'" [ngClass]="{'mr-3': !isSidebarCollapsed || isMobileSidebarOpen}"></i>
+                <span class="white-space-nowrap" style="font-size: 12.8px;" *ngIf="!isSidebarCollapsed || isMobileSidebarOpen">{{item.label}}</span>
+            </a>
+        </div>
+
+        <!-- Main Workspace -->
+        <div class="main-workspace flex-auto p-5 overflow-y-auto w-full">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+
+</div>

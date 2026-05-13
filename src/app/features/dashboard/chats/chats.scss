@@ -1,0 +1,73 @@
+// =============================================
+// Chats - WhatsApp-Style Responsive Layout
+// =============================================
+
+:host {
+  display: block;
+  height: 100%;
+}
+
+// =============================================
+// Mobile: < 768px — WhatsApp-style view switching
+// =============================================
+@media (max-width: 767px) {
+
+  // Full viewport, no rounded corners, no shadow, no border — flush to edges
+  .chat-container {
+    height: calc(100vh - 3.8rem) !important; // Full viewport minus navbar
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  // Contact list panel: full width on mobile
+  .contacts-panel {
+    width: 100% !important;
+    border-right: none !important;
+
+    // Hide when a contact is selected (conversation view is active)
+    &.mobile-hidden {
+      display: none !important;
+    }
+  }
+
+  // Conversation panel: full width on mobile
+  .conversation-panel {
+    display: none; // Hidden by default (no contact selected)
+
+    &.mobile-active {
+      display: flex !important;
+      width: 100% !important;
+    }
+  }
+
+  // Back button visible only on mobile
+  .mobile-back-btn {
+    display: flex !important;
+  }
+
+  // Message bubbles: wider on mobile
+  .message-bubble {
+    max-width: 85% !important;
+  }
+}
+
+// =============================================
+// Desktop/Tablet >= 768px
+// =============================================
+@media (min-width: 768px) {
+  .mobile-back-btn {
+    display: none !important;
+  }
+
+  .conversation-panel {
+    display: flex !important;
+  }
+
+  .contacts-panel {
+    display: flex !important;
+  }
+}

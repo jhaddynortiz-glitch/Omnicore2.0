@@ -1,0 +1,136 @@
+.organizations-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.header {
+    margin-bottom: 2.5rem;
+
+    .title {
+        font-size: 2rem;
+        font-weight: 800;
+        background: var(--p-primary-500);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0;
+        letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+        color: var(--text-color-secondary);
+        opacity: 0.6;
+        margin: 0.5rem 0 0;
+        font-size: 1rem;
+        line-height: 1.5;
+    }
+}
+
+.content-card {
+    transition: box-shadow 0.3s ease;
+
+    &:hover {
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.15) !important;
+    }
+}
+
+.org-cell {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.org-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--p-primary-500);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.org-name {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.role-badge {
+    background: rgba(var(--p-primary-500-rgb, 59, 130, 246), 0.1);
+    color: var(--p-primary-500);
+    border: 1px solid rgba(var(--p-primary-500-rgb, 59, 130, 246), 0.2);
+}
+
+.slug-badge {
+    font-family: 'JetBrains Mono', 'Monaco', monospace;
+}
+
+// Global overrides for PrimeNG Table in this component
+:host ::ng-deep {
+    .p-datatable {
+        .p-datatable-tbody>tr {
+            background: transparent !important;
+            transition: background-color 0.2s ease;
+
+            &:last-child>td {
+                border-bottom: 0 !important;
+            }
+        }
+    }
+
+    .p-tag {
+        font-weight: 600;
+        font-size: 0.75rem;
+    }
+}
+
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 5rem;
+
+    i {
+        font-size: 2.5rem;
+        color: var(--p-primary-500);
+    }
+
+    span {
+        font-weight: 500;
+        opacity: 0.7;
+    }
+}
+
+.empty-state {
+    text-align: center;
+    padding: 5rem 2rem;
+
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+        color: var(--p-primary-500);
+        opacity: 0.3;
+    }
+
+    h3 {
+        margin: 0 0 0.75rem;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-900);
+    }
+
+    p {
+        margin: 0;
+        font-size: 1rem;
+        max-width: 450px;
+        margin: 0 auto;
+        line-height: 1.6;
+        opacity: 0.6;
+    }
+}

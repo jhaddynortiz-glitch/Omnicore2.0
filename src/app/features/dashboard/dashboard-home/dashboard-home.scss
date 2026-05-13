@@ -1,0 +1,89 @@
+.kpi-card {
+    background: linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+        transform: translateY(-5px);
+        border-color: rgba(var(--p-primary-500-rgb, 59, 130, 246), 0.3);
+        box-shadow: 0 10px 40px -10px rgba(var(--p-primary-500-rgb, 59, 130, 246), 0.15);
+    }
+
+    .kpi-icon-wrapper {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        background: rgba(255,255,255,0.05);
+    }
+}
+
+.glow-primary { text-shadow: 0 0 15px rgba(var(--p-primary-500-rgb, 59, 130, 246), 0.5); }
+.glow-green { text-shadow: 0 0 15px rgba(16, 185, 129, 0.5); }
+.glow-orange { text-shadow: 0 0 15px rgba(245, 158, 11, 0.5); }
+.glow-purple { text-shadow: 0 0 15px rgba(139, 92, 246, 0.5); }
+
+.activity-feed {
+    .activity-item {
+        position: relative;
+        padding-left: 2rem;
+        padding-bottom: 1.5rem;
+        
+        &:last-child {
+            padding-bottom: 0;
+            &::before { display: none; }
+        }
+
+        &::before {
+            content: '';
+            position: absolute;
+            left: 0.5rem;
+            top: 2rem;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.1), rgba(255,255,255,0.02));
+        }
+
+        .activity-icon-node {
+            position: absolute;
+            left: -0.1rem;
+            top: 0.25rem;
+            width: 1.35rem;
+            height: 1.35rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.70rem;
+            background: var(--surface-card);
+            border: 2px solid;
+            z-index: 2;
+        }
+    }
+}
+
+.stats-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 1.5rem;
+}
+
+.custom-progress {
+    height: 8px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.05);
+    overflow: hidden;
+
+    .progress-bar {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 1s ease-out;
+    }
+}

@@ -1,0 +1,196 @@
+<p-toast></p-toast>
+
+<div class="user-access-container p-4">
+    <div class="header-section flex justify-content-between align-items-center mb-5">
+        <div>
+            <h1 class="title">Acceso de Usuarios</h1>
+            <p class="subtitle text-600">Gestiona los miembros de tu equipo y sus permisos en la organización.</p>
+        </div>
+        <button pButton icon="pi pi-plus" label="Agregar Usuario" (click)="openAddModal()" 
+            class="p-button-rounded gradient-btn shadow-2"></button>
+    </div>
+
+    <div class="content-card surface-card p-4 shadow-2 border-round-xl border-1 surface-border">
+        @if (members().length === 0) {
+            <div class="empty-state py-8">
+                <i class="pi pi-users empty-icon opacity-30"></i>
+                <h3 class="text-900">Sin miembros</h3>
+                <p class="text-600">Aún no has agregado miembros a esta organización. Los usuarios que invites aparecerán aquí.</p>
+            </div>
+        } @else {
+            <p-table [value]="members()" [tableStyle]="{'min-width': '100%'}" styleClass="p-datatable-sm">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th class="bg-transparent border-bottom-1 surface-border text-900 font-bold py-3">Usuario</th>
+                        <th class="bg-transparent border-bottom-1 surface-border text-900 font-bold py-3">Correo</th>
+                        <th class="bg-transparent border-bottom-1 surface-border text-900 font-bold py-3">Rol</th>
+                        <th class="bg-transparent border-bottom-1 surface-border text-900 font-bold py-3">Estado</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-member>
+                    <tr class="hover:surface-hover transition-colors transition-duration-150 cursor-pointer" (click)="openEditModal(member)">
+                        <td class="border-bottom-1 surface-border py-3">
+                            <div class="member-cell flex align-items-center gap-3">
+                                <div class="member-avatar shadow-1">
+                                    @if (member.User.avatarUrl) {
+                                        <img [src]="member.User.avatarUrl" [alt]="member.User.fullName" />
+                                    } @else {
+                                        <span class="avatar-initials text-white font-bold">
+                                            {{(member.User.fullName || member.User.email).charAt(0).toUpperCase()}}
+                                        </span>
+                                    }
+                                </div>
+                                <span class="member-name text-900 font-semibold">{{member.User.fullName || 'Sin nombre'}}</span>
+                            </div>
+                        </td>
+                        <td class="border-bottom-1 surface-border py-3">
+                            <span class="text-700">{{member.User.email}}</span>
+                        </td>
+                        <td class="border-bottom-1 surface-border py-3">
+                            <span class="role-badge px-3 py-1 border-round-2xl text-xs font-semibold">
+                                {{getRoleLabel(member.role)}}
+                            </span>
+                        </td>
+                        <td class="border-bottom-1 surface-border py-3">
+                            <p-tag [value]="getStatusLabel(member.status)" [severity]="getStatusSeverity(member.status)" styleClass="border-round-2xl px-3"></p-tag>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        }
+    </div>
+</div>
+
+<!-- Modal de invitación -->
+<p-dialog [(visible)]="showModal" [modal]="true" [header]="currentStep() === 1 ? 'Información del Usuario' : 'Selección de Rol'" 
+    [style]="{width: '450px'}" [draggable]="false" [resizable]="false" 
+    styleClass="glass-modal" [closable]="!loading()">
+    
+    <div class="modal-content pt-4">
+        <!-- Paso 1: Datos Personales -->
+        @if (currentStep() === 1) {
+            <div [formGroup]="userForm" class="form-fields">
+                <div class="field">
+                    <label for="fullName">Nombre Completo</label>
+                    <input pInputText id="fullName" formControlName="fullName" placeholder="Ej. Juan Pérez" 
+                        class="w-full" />
+                </div>
+
+                <div class="field">
+                    <label for="email">Correo Electrónico</label>
+                    <input pInputText id="email" formControlName="email" type="email" placeholder="juan&#64;ejemplo.com" 
+                        class="w-full" />
+                    @if (emailError()) {
+                        <small class="error-msg">
+                            <i class="pi pi-exclamation-triangle"></i> {{emailError()}}
+                        </small>
+                    }
+                </div>
+            </div>
+        }
+
+        <!-- Paso 2: Selección de Rol -->
+        @if (currentStep() === 2) {
+            <p class="step2-hint">Selecciona el nivel de acceso que tendrá este usuario en la organización.</p>
+            
+            @for (role of roles; track role.value) {
+                <div class="role-option" 
+                    [class.selected]="selectedRole() === role.value"
+                    (click)="selectedRole.set(role.value)">
+                    <p-radioButton [name]="'role'" [value]="role.value" [ngModel]="selectedRole()" (ngModelChange)="selectedRole.set($event)"></p-radioButton>
+                    <div class="role-info">
+                        <i [class]="role.icon + ' role-icon'"></i>
+                        <div>
+                            <span class="role-label">{{role.label}}</span>
+                            <span class="role-desc">{{role.desc}}</span>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    <ng-template pTemplate="footer">
+        <div class="modal-footer">
+            @if (currentStep() === 2) {
+                <button pButton label="Anterior" icon="pi pi-arrow-left" 
+                    class="p-button-text p-button-secondary" (click)="prevStep()" [disabled]="loading()"></button>
+            }
+            <div class="spacer"></div>
+            
+            @if (currentStep() === 1) {
+                <button pButton label="Siguiente" icon="pi pi-arrow-right" iconPos="right" 
+                    class="p-button-rounded gradient-btn" (click)="verifyAndNext()" [loading]="checkingEmail()"></button>
+            }
+            
+            @if (currentStep() === 2) {
+                <button pButton label="Guardar Acceso" icon="pi pi-check" 
+                    class="p-button-rounded gradient-btn" (click)="saveUser()" [loading]="loading()"></button>
+            }
+        </div>
+    </ng-template>
+</p-dialog>
+
+<!-- Modal de Edición de Usuario -->
+<p-dialog [(visible)]="showEditModal" [modal]="true" header="Editar Accesos" 
+    [style]="{width: '450px'}" [draggable]="false" [resizable]="false" 
+    styleClass="glass-modal" [closable]="!loading()">
+    
+    <div class="modal-content pt-2">
+        @if (selectedMember()) {
+            <div class="flex justify-content-end mb-2">
+                <button pButton label="Remover participante" icon="pi pi-trash" class="p-button-danger p-button-text py-1 px-2 text-sm font-semibold" (click)="removeMember()" [disabled]="loading()"></button>
+            </div>
+
+            <div class="edit-user-profile mb-4 flex align-items-center gap-3 p-3 surface-ground border-round-xl">
+                <div class="member-avatar shadow-1" style="width: 48px; height: 48px; font-size: 1.2rem;">
+                    @if (selectedMember()?.User?.avatarUrl) {
+                        <img [src]="selectedMember()?.User?.avatarUrl" [alt]="selectedMember()?.User?.fullName" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" />
+                    } @else {
+                        <span class="avatar-initials text-white font-bold flex align-items-center justify-content-center h-full w-full border-circle bg-primary">
+                            {{(selectedMember()?.User?.fullName || selectedMember()?.User?.email)?.charAt(0)?.toUpperCase()}}
+                        </span>
+                    }
+                </div>
+                <div class="flex flex-column gap-1">
+                    <h3 class="m-0 text-900 font-semibold">{{selectedMember()?.User?.fullName || 'Sin nombre'}}</h3>
+                    <span class="text-600 text-sm">{{selectedMember()?.User?.email}}</span>
+                </div>
+                <div class="ml-auto">
+                    <p-tag [value]="getStatusLabel(selectedMember()?.status || '')" [severity]="getStatusSeverity(selectedMember()?.status || '')" styleClass="border-round-2xl px-3"></p-tag>
+                </div>
+            </div>
+
+            <div class="roles-section mb-4">
+                <div class="flex align-items-center justify-content-between mb-3 px-1">
+                    <p class="font-semibold text-900 m-0">Rol del Usuario</p>
+                    <span class="text-500 text-xs shadow-1 surface-ground px-2 py-1 border-round-xl">Selecciona el nivel de acceso</span>
+                </div>
+                @for (role of roles; track role.value) {
+                    <div class="role-option" 
+                        [class.selected]="editRole() === role.value"
+                        (click)="editRole.set(role.value)">
+                        <p-radioButton [name]="'editRole'" [value]="role.value" [ngModel]="editRole()" (ngModelChange)="editRole.set($event)"></p-radioButton>
+                        <div class="role-info">
+                            <i [class]="role.icon + ' role-icon'"></i>
+                            <div>
+                                <span class="role-label">{{role.label}}</span>
+                                <span class="role-desc">{{role.desc}}</span>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <ng-template pTemplate="footer">
+        <div class="modal-footer">
+            <button pButton label="Cancelar" icon="pi pi-times" 
+                class="p-button-text p-button-secondary" (click)="showEditModal.set(false)" [disabled]="loading()"></button>
+            <div class="spacer"></div>
+            <button pButton label="Guardar Cambios" icon="pi pi-check" 
+                class="p-button-rounded gradient-btn" (click)="updateMember()" [loading]="loading()"></button>
+        </div>
+    </ng-template>
+</p-dialog>

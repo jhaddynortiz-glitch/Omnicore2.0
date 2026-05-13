@@ -1,0 +1,105 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="prompts-container p-4">
+    <div class="header-section flex justify-content-between align-items-center mb-5">
+        <div>
+            <h1 class="title">Instrucciones (Prompts)</h1>
+            <p class="subtitle text-600">Personaliza la personalidad y el flujo de ventas de tu asistente de IA.</p>
+        </div>
+        <button pButton icon="pi pi-plus" label="Crear Prompt" (click)="openNew()" 
+            class="p-button-rounded gradient-btn shadow-2"></button>
+    </div>
+
+    <div class="grid">
+        @if (loading()) {
+            <div class="col-12 py-8 text-center">
+                <i class="pi pi-spin pi-spinner text-4xl text-primary"></i>
+                <p class="mt-3 text-600">Cargando instrucciones...</p>
+            </div>
+        } @else if (prompts().length === 0) {
+            <div class="col-12 py-8 text-center surface-card border-round-xl border-1 surface-border">
+                <i class="pi pi-bolt empty-icon opacity-20 text-6xl"></i>
+                <h3 class="text-900 mt-4">Sin instrucciones</h3>
+                <p class="text-600">Crea tu primer prompt para que el bot sepa cómo responder.</p>
+            </div>
+        } @else {
+            @for (prompt of prompts(); track prompt.id) {
+                <div class="col-12 md:col-6 lg:col-4">
+                    <div class="prompt-card surface-card p-4 shadow-1 border-round-xl border-1" 
+                         [class.active-border]="prompt.isActive"
+                         [class.surface-border]="!prompt.isActive">
+                        
+                        <div class="flex justify-content-between align-items-center mb-3">
+                            <h3 class="m-0 text-900 font-bold">{{prompt.name}}</h3>
+                            <p-toggleswitch [ngModel]="prompt.isActive" (onChange)="toggleActive(prompt)"></p-toggleswitch>
+                        </div>
+                        
+                        <p class="text-600 text-sm mb-4 prompt-preview">
+                            {{prompt.content}}
+                        </p>
+
+                        <div class="flex justify-content-between align-items-center">
+                            <span class="status-indicator flex align-items-center gap-2">
+                                <i class="pi pi-circle-fill text-xs" [class.text-success]="prompt.isActive" [class.text-400]="!prompt.isActive"></i>
+                                <span class="text-xs font-semibold">{{prompt.isActive ? 'Activo' : 'Inactivo'}}</span>
+                            </span>
+                            
+                            <div class="actions">
+                                <button pButton icon="pi pi-pencil" 
+                                    class="p-button-rounded p-button-text p-button-sm"
+                                    (click)="editPrompt(prompt)"></button>
+                                <button pButton icon="pi pi-trash" 
+                                    class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                                    (click)="deletePrompt(prompt)"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<p-dialog [(visible)]="showDialog" [modal]="true" 
+    [header]="isEditing() ? 'Editar Instrucciones' : 'Nuevas Instrucciones'" 
+    [style]="{width: '700px'}" [draggable]="false" [resizable]="false"
+    styleClass="glass-modal">
+    
+    <div [formGroup]="promptForm" class="p-fluid pt-4">
+        <div class="field mb-4">
+            <label for="name" class="font-bold block mb-2">Nombre del Prompt</label>
+            <input pInputText id="name" formControlName="name" placeholder="Ej. Ventas Campaña Navidad" />
+        </div>
+
+        <div class="field mb-4">
+            <label for="content" class="font-bold block mb-2">Contenido (Instrucciones del Sistema)</label>
+            <div class="prompt-helper mb-3 flex align-items-center gap-3 p-3 border-round-lg border-1 surface-border bg-black-alpha-10 shadow-1">
+                <i class="pi pi-info-circle text-primary text-2xl"></i>
+                <span class="text-xs line-height-3 text-900 font-medium">
+                    Usa <strong>{{ '{' }}{{ '{' }}productos{{ '}' }}{{ '}' }}</strong> para inyectar automáticamente tu catálogo de productos en esta posición del mensaje.
+                </span>
+            </div>
+            <textarea pTextarea id="content" formControlName="content" rows="10" 
+                class="prompt-textarea w-full"
+                placeholder="Eres un asistente que ayudara a los clientes..."></textarea>
+        </div>
+
+        <div class="field-checkbox flex align-items-center gap-3 p-3 surface-card border-round-xl border-1 surface-border shadow-1">
+            <p-toggleswitch id="isActive" formControlName="isActive"></p-toggleswitch>
+            <div class="flex flex-column">
+                <label for="isActive" class="font-bold m-0 cursor-pointer text-900">Establecer como activo</label>
+                <small class="text-600">Este prompt será el que use la IA para todas las conversaciones.</small>
+            </div>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <div class="flex justify-content-end gap-2">
+            <button pButton label="Cancelar" icon="pi pi-times" 
+                class="p-button-text p-button-secondary" (click)="showDialog.set(false)"></button>
+            <button pButton label="Guardar" icon="pi pi-check" 
+                class="p-button-rounded gradient-btn" (click)="savePrompt()" [loading]="saving()"></button>
+        </div>
+    </ng-template>
+</p-dialog>

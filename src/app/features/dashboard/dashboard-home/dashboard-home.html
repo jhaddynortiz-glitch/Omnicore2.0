@@ -1,0 +1,119 @@
+<div class="dashboard-container w-full h-full p-4 fadein animation-duration-300">
+    <!-- Header -->
+    <div class="flex flex-column md:flex-row md:align-items-center justify-content-between mb-5 gap-3">
+        <div>
+            <h1 class="text-900 font-bold text-3xl m-0 flex align-items-center gap-3">
+                Resumen de OmniCore <p-tag value="SIMULACIÓN" severity="info" styleClass="border-round-2xl"></p-tag>
+            </h1>
+            <p class="text-500 m-0 mt-1">Una vista general simulada del rendimiento de tu asistente y métricas globales.</p>
+        </div>
+        <div class="flex gap-2">
+            <span class="px-3 py-2 border-round-xl border-1 surface-border surface-ground text-sm flex align-items-center gap-2 font-medium">
+                <i class="pi pi-circle-fill text-green-500 text-xs glow-green pt-1"></i> Bot Orizon: Online
+            </span>
+            <button pButton icon="pi pi-refresh" class="p-button-rounded p-button-text p-button-secondary border-1 surface-border surface-ground"></button>
+        </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="grid mb-5">
+        <div class="col-12 md:col-6 xl:col-3">
+            <div class="kpi-card">
+                <div class="flex justify-content-between mb-3">
+                    <div class="kpi-icon-wrapper text-primary bg-primary-reverse">
+                        <i class="pi pi-comments glow-primary"></i>
+                    </div>
+                    <span class="text-green-400 font-semibold text-sm flex align-items-center"><i class="pi pi-arrow-up text-xs mr-1"></i> 12%</span>
+                </div>
+                <span class="text-500 font-medium text-sm block mb-1">Chats Activos</span>
+                <div class="text-900 font-bold text-4xl">{{activeChats()}}</div>
+            </div>
+        </div>
+        <div class="col-12 md:col-6 xl:col-3">
+            <div class="kpi-card">
+                <div class="flex justify-content-between mb-3">
+                    <div class="kpi-icon-wrapper text-orange-400" style="background: rgba(245, 158, 11, 0.1);">
+                        <i class="pi pi-clock glow-orange"></i>
+                    </div>
+                    <span class="text-red-400 font-semibold text-sm flex align-items-center"><i class="pi pi-arrow-up text-xs mr-1"></i> 2</span>
+                </div>
+                <span class="text-500 font-medium text-sm block mb-1">Chats en Espera</span>
+                <div class="text-900 font-bold text-4xl">{{waitingChats()}}</div>
+            </div>
+        </div>
+        <div class="col-12 md:col-6 xl:col-3">
+            <div class="kpi-card">
+                <div class="flex justify-content-between mb-3">
+                    <div class="kpi-icon-wrapper text-green-400" style="background: rgba(16, 185, 129, 0.1);">
+                        <i class="pi pi-bolt glow-green"></i>
+                    </div>
+                    <span class="text-green-400 font-semibold text-sm flex align-items-center"><i class="pi pi-arrow-up text-xs mr-1"></i> 5%</span>
+                </div>
+                <span class="text-500 font-medium text-sm block mb-1">Resolución del Bot IA</span>
+                <div class="flex align-items-end gap-2">
+                    <div class="text-900 font-bold text-4xl">{{botResolution()}}%</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 md:col-6 xl:col-3">
+            <div class="kpi-card">
+                <div class="flex justify-content-between mb-3">
+                    <div class="kpi-icon-wrapper text-purple-400" style="background: rgba(168, 85, 247, 0.1);">
+                        <i class="pi pi-stopwatch glow-purple"></i>
+                    </div>
+                    <span class="text-green-400 font-semibold text-sm flex align-items-center"><i class="pi pi-arrow-down text-xs mr-1"></i> 10s</span>
+                </div>
+                <span class="text-500 font-medium text-sm block mb-1">Tiempo de Respuesta</span>
+                <div class="text-900 font-bold text-4xl">{{avgResponseTime()}}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="grid">
+        <!-- Top Products List (Simulated Graphic Chart via CSS) -->
+        <div class="col-12 xl:col-7">
+            <div class="stats-card p-4 h-full">
+                <h3 class="m-0 text-900 font-bold mb-4 flex align-items-center gap-2"><i class="pi pi-chart-bar text-primary"></i> Intercambios de IA por Producto</h3>
+                
+                <div class="flex flex-column gap-4">
+                    @for (product of topProducts(); track product.name) {
+                        <div>
+                            <div class="flex justify-content-between font-medium mb-2">
+                                <span class="text-800 text-sm">{{product.name}}</span>
+                                <span class="text-500 text-sm">{{product.percentage}}%</span>
+                            </div>
+                            <div class="custom-progress">
+                                <div class="progress-bar" [style.width]="product.percentage + '%'" [style.backgroundColor]="product.color"></div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Feed -->
+        <div class="col-12 xl:col-5">
+            <div class="stats-card p-4 h-full">
+                <h3 class="m-0 text-900 font-bold mb-4 flex align-items-center gap-2"><i class="pi pi-history text-primary"></i> Actividad Reciente</h3>
+                
+                <div class="activity-feed mt-4">
+                    @for (activity of recentActivities(); track $index) {
+                        <div class="activity-item">
+                            <div class="activity-icon-node" [style.borderColor]="'var(--surface-500)'">
+                                <i [class]="activity.icon" [ngClass]="activity.color"></i>
+                            </div>
+                            <div class="surface-ground border-round-xl p-3 border-1 surface-border hover:surface-hover transition-colors">
+                                <div class="flex justify-content-between align-items-start mb-1">
+                                    <span class="font-bold text-900 text-sm">{{activity.title}}</span>
+                                    <span class="text-500 text-xs pl-2 white-space-nowrap">{{activity.time}}</span>
+                                </div>
+                                <p class="m-0 text-500 text-sm line-height-3">{{activity.desc}}</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

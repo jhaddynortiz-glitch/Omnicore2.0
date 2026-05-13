@@ -1,0 +1,51 @@
+<p-toast></p-toast>
+<div class="register-container flex align-items-center justify-content-center min-h-screen p-4 surface-ground">
+    <div class="glass-card p-5 shadow-4 border-round-2xl w-full surface-card" style="max-width: 450px;">
+        
+        <div class="text-center mb-5">
+            <h1 class="text-900 text-4xl font-bold mb-2">OmniCore</h1>
+            <p class="text-600 font-medium line-height-3">Comienza a gestionar tus chats hoy mismo</p>
+        </div>
+
+        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="flex flex-column gap-4">
+            
+            <div class="flex flex-column gap-2">
+                <label for="fullName" class="font-semibold text-700">Nombre Completo</label>
+                <input id="fullName" type="text" pInputText formControlName="fullName" 
+                       placeholder="Juan Pérez" class="w-full border-round-lg p-3" />
+                <small *ngIf="registerForm.get('fullName')?.invalid && registerForm.get('fullName')?.touched" class="p-error">
+                    El nombre es obligatorio.
+                </small>
+            </div>
+
+            <div class="flex flex-column gap-2">
+                <label for="email" class="font-semibold text-700">Correo Electrónico</label>
+                <input id="email" type="email" pInputText formControlName="email" 
+                       placeholder="ejemplo@correo.com" class="w-full border-round-lg p-3" />
+                <small *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="p-error">
+                    Ingresa un correo válido.
+                </small>
+            </div>
+
+            <div class="flex flex-column gap-2">
+                <label for="password" class="font-semibold text-700">Contraseña</label>
+                <p-password id="password" formControlName="password" [toggleMask]="true" 
+                           [feedback]="false" styleClass="w-full" inputStyleClass="w-full p-3 border-round-lg"
+                           placeholder="••••••••"></p-password>
+                <small *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" class="p-error">
+                    Mínimo 6 caracteres.
+                </small>
+            </div>
+
+            <p-button label="Crear Cuenta" type="submit" [loading]="loading" 
+                      styleClass="w-full py-3 text-lg font-bold border-round-lg"
+                      [disabled]="registerForm.invalid"></p-button>
+
+        </form>
+
+        <div class="text-center mt-5 text-600">
+            ¿Ya tienes cuenta? <a routerLink="/login" class="text-primary font-bold no-underline hover:underline">Inicia sesión</a>
+        </div>
+    </div>
+</div>
+

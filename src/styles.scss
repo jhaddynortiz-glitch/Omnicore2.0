@@ -1,0 +1,236 @@
+// Opaline Core Palette (SCSS Variables)
+$opaline-primary: #FF634A;
+$opaline-primary-hover: #e55942;
+
+// Light Palette Definitions
+$opaline-light-bg: #F4F4F6;
+$opaline-light-card: #ffffff;
+$opaline-light-border: #E7E7E7;
+$opaline-light-text: #1a1a1a;
+$opaline-light-text-secondary: #646468;
+
+// Dark Palette Definitions
+$opaline-dark-bg: #1a1a1a;
+$opaline-dark-card: #242424;
+$opaline-dark-border: #333333;
+$opaline-dark-text: #F5F5F5;
+$opaline-dark-text-secondary: #A3A3A3;
+
+/* ------------------------------------------------------------- */
+/* FORZADO ABSOLUTO DE CLASES DE SUPERFICIE PRIMEFLEX            */
+/* ------------------------------------------------------------- */
+
+// Forzado Global (Light Mode Default)
+.surface-hover {
+    background-color: $opaline-light-border !important;
+}
+.hover\:surface-hover:hover {
+    background-color: $opaline-light-border !important;
+}
+.surface-section {
+    background-color: #f8f9fa !important;
+}
+.surface-border {
+    border-color: $opaline-light-border !important;
+}
+
+// Global Body Styles anidados nativamente
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--p-font-family, 'Inter', sans-serif);
+    background-color: $opaline-light-bg;
+    color: $opaline-light-text;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+// Helpers Extra de Bordes
+.border-round-xl { border-radius: 1rem; }
+.border-round-2xl { border-radius: 1.5rem; }
+.border-round-3xl { border-radius: 2rem; }
+
+// Reglas específicas si necesitamos controlar SCSS en componentes anidados
+.surface-card {
+    background-color: $opaline-light-card !important;
+    border: 1px solid $opaline-light-border;
+}
+
+/* ------------------------------------------------------------- */
+/* FORZADO ABSOLUTO PARA EL DARK MODE Y UTILERIAS PRIMEFLEX      */
+/* ------------------------------------------------------------- */
+// Estilo solicitado por el usuario para el menú (Base / Light Mode)
+// Se define aquí arriba para que las reglas de dark mode de abajo puedan sobrescribirlo
+.p-menu .p-menu-item-link {
+    color: dimgray !important;
+    .p-menu-item-label, .p-menu-item-icon {
+        color: dimgray !important;
+    }
+}
+
+/* ------------------------------------------------------------- */
+/* FORZADO ABSOLUTO PARA EL DARK MODE Y UTILERIAS PRIMEFLEX      */
+/* ------------------------------------------------------------- */
+html.app-dark {
+    
+    // Sobrescribimos el Body nativo
+    body {
+        background-color: $opaline-dark-bg !important;
+        color: $opaline-dark-text !important;
+    }
+
+    // Sobrescritura de Tarjetas y Fondos PrimeFlex
+    .surface-ground {
+        background-color: $opaline-dark-bg !important;
+    }
+
+    .surface-card {
+        background-color: $opaline-dark-card !important;
+        border-color: $opaline-dark-border !important;
+    }
+
+    .surface-hover {
+        background-color: $opaline-dark-border !important;
+    }
+    .hover\:surface-hover:hover {
+        background-color: $opaline-dark-border !important;
+    }
+    .surface-section {
+        background-color: rgba(255, 255, 255, 0.03) !important;
+    }
+    .surface-border {
+        border-color: $opaline-dark-border !important;
+    }
+
+    // Sobrescritura Textos PrimeFlex (que suelen ignorar variables globales)
+    .text-900, .text-800 {
+        color: $opaline-dark-text !important;
+    }
+
+    .text-700, .text-600 {
+        color: $opaline-dark-text-secondary !important;
+    }
+
+    .text-primary {
+        color: $opaline-primary !important;
+    }
+
+    // --- Soporte nativo para Componentes PrimeNG 18 ---
+    .p-dialog {
+        border: none !important;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+
+        .p-dialog-header, .p-dialog-content, .p-dialog-footer {
+            background-color: $opaline-dark-card !important;
+            color: $opaline-dark-text !important;
+            border: none !important;
+        }
+        
+        // Textos y etiquetas internos
+        label, .text-700, .text-600 {
+            color: $opaline-dark-text !important;
+        }
+    }
+
+    .p-menu {
+        background-color: $opaline-dark-card !important;
+        border-color: $opaline-dark-border !important;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4) !important;
+
+        // Texto e iconos forzados a blanco en dark mode (v18)
+        // Usamos selectores universales para asegurar que nada escape
+        &, .p-menu-item-link, .p-menu-item-label, .p-menu-item-icon {
+            color: #ffffff !important;
+        }
+
+        .p-menu-item-content:hover {
+            background-color: $opaline-dark-border !important;
+            * { color: #ffffff !important; }
+        }
+    }
+
+    // Estilos generales para inputs y textareas en Dark Mode
+    input, textarea, .p-inputtext, .p-inputnumber-input {
+        background-color: $opaline-dark-card !important;
+        color: $opaline-dark-text !important;
+        border: 1px solid $opaline-dark-border !important;
+        
+        &:focus {
+            border-color: $opaline-primary !important;
+            box-shadow: 0 0 0 0.2rem rgba($opaline-primary, 0.2) !important;
+        }
+    }
+    
+    // Eliminamos la anidación exclusiva en .p-dialog para que aplique a toda la app
+    .p-dialog {
+        // Otros estilos de dialog si existieran
+    }
+
+    input::placeholder, textarea::placeholder {
+        color: $opaline-dark-text-secondary !important;
+        opacity: 0.5;
+    }
+
+    // Corregir fondo de ToggleSwitch y otros componentes comunes
+    .p-toggleswitch {
+        .p-toggleswitch-slider {
+            background: $opaline-dark-border !important;
+            border-color: $opaline-dark-border !important;
+        }
+        &.p-toggleswitch-checked .p-toggleswitch-slider {
+            background: $opaline-primary !important;
+            border-color: $opaline-primary !important;
+        }
+    }
+
+    // Soporte Pestañas PrimeNG 21
+    .p-tabs {
+        background: transparent !important;
+        .p-tablist-tab-list {
+            background: transparent !important;
+            border-color: $opaline-dark-border !important;
+        }
+        .p-tab {
+            background: transparent !important;
+            color: $opaline-dark-text-secondary !important;
+            &.p-tab-active {
+                color: $opaline-primary !important;
+            }
+        }
+        .p-tabpanels {
+            background: transparent !important;
+            color: $opaline-dark-text !important;
+        }
+    }
+
+    // Soporte Select (Dropdown) PrimeNG 21
+    .p-select {
+        background: $opaline-dark-card !important;
+        border-color: $opaline-dark-border !important;
+        color: $opaline-dark-text !important;
+        
+        &.p-focus {
+            border-color: $opaline-primary !important;
+        }
+
+        .p-select-label {
+            color: $opaline-dark-text !important;
+        }
+
+        .p-select-overlay {
+            background: $opaline-dark-card !important;
+            border-color: $opaline-dark-border !important;
+            color: $opaline-dark-text !important;
+            
+            .p-select-option {
+                color: $opaline-dark-text !important;
+                &.p-select-option-selected {
+                    background: rgba($opaline-primary, 0.1) !important;
+                    color: $opaline-primary !important;
+                }
+                &:hover:not(.p-select-option-selected) {
+                    background: $opaline-dark-border !important;
+                }
+            }
+        }
+    }
+}

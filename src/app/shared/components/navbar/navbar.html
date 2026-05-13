@@ -1,0 +1,41 @@
+<div [ngClass]="{
+        'mx-4 mt-3 shadow-2 border-round-xl': layoutStyle === 'landing',
+        'border-bottom-1 surface-border': layoutStyle === 'dashboard'
+     }"
+     class="flex justify-content-between align-items-center px-5 py-3 surface-card relative z-5" 
+     style="backdrop-filter: blur(10px); background-color: color-mix(in srgb, var(--p-surface-0) 80%, transparent);">
+    
+    <div class="flex align-items-center gap-3">
+        <div class="flex align-items-center" style="cursor: pointer;" routerLink="/">
+            <i class="pi pi-box text-3xl text-primary mr-2" style="background: linear-gradient(90deg, var(--p-primary-500) 0%, var(--p-primary-400) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
+            <span class="font-bold text-2xl text-900 tracking-tight">Omni<span class="text-primary">Core</span></span>
+        </div>
+        
+        <!-- Botón de Hamburguesa para Sidebar -->
+        <p-button *ngIf="layoutStyle === 'dashboard'" icon="pi pi-bars" [text]="true" [rounded]="true" severity="secondary" (click)="onMenuClick()"></p-button>
+    </div>
+
+    <div class="flex align-items-center gap-3">
+        <!-- Landing Options -->
+        <ng-container *ngIf="layoutStyle === 'landing'">
+            <a class="text-600 hover:text-900 cursor-pointer transition-colors transition-duration-200 font-medium hidden md:block">Funciones</a>
+            <a class="text-600 hover:text-900 cursor-pointer transition-colors transition-duration-200 font-medium hidden md:block">Planes</a>
+            <div class="mx-2 hidden md:block" style="width: 1px; height: 20px; background-color: var(--p-surface-border);"></div>
+        </ng-container>
+        
+        <!-- Global Options -->
+        <p-button [icon]="themeService.isDarkMode() ? 'pi pi-moon' : 'pi pi-sun'" [rounded]="true" [text]="true" severity="secondary" (click)="toggleDarkMode()"></p-button>
+        
+        <!-- Login Button for Landing -->
+        <p-button *ngIf="layoutStyle === 'landing' && showLoginButton" label="Iniciar Sesión" icon="pi pi-user" severity="primary" [rounded]="true" routerLink="/login"></p-button>
+
+        <!-- User Profile for Dashboard -->
+        <ng-container *ngIf="layoutStyle === 'dashboard'">
+            <p-menu #menu [model]="userMenuItems()" [popup]="true"></p-menu>
+            <div class="flex align-items-center justify-content-center w-2rem h-2rem border-circle surface-section border-1 surface-border cursor-pointer hover:surface-hover transition-colors ml-2"
+                 (click)="menu.toggle($event)">
+                <i class="pi pi-user text-600 text-sm"></i>
+            </div>
+        </ng-container>
+    </div>
+</div>

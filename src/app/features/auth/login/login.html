@@ -1,0 +1,58 @@
+<p-toast></p-toast>
+<div class="login-container flex align-items-center justify-content-center min-h-screen p-4 surface-ground">
+    <div class="glass-card p-5 shadow-4 border-round-2xl w-full surface-card" style="max-width: 450px;">
+        
+        <div class="text-center mb-5">
+            <h1 class="text-900 text-4xl font-bold mb-2">OmniCore</h1>
+            <p class="text-600 font-medium line-height-3">Inicia sesión en tu cuenta</p>
+        </div>
+
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-column gap-4">
+            
+            <div class="flex flex-column gap-2">
+                <label for="email" class="font-semibold text-700">Correo Electrónico</label>
+                <input id="email" type="email" pInputText formControlName="email" 
+                       placeholder="ejemplo@correo.com" class="w-full p-3 border-round-lg" />
+                <small *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="p-error">
+                    Ingresa un correo válido.
+                </small>
+            </div>
+
+            <div class="flex flex-column gap-2">
+                <label for="password" class="font-semibold text-700">Contraseña</label>
+                <p-password id="password" formControlName="password" [toggleMask]="true" 
+                           [feedback]="false" styleClass="w-full" inputStyleClass="w-full p-3 border-round-lg"
+                           placeholder="••••••••"></p-password>
+                <small *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="p-error">
+                    Mínimo 6 caracteres.
+                </small>
+            </div>
+
+            <div class="flex align-items-center justify-content-between mb-2">
+                <div class="flex align-items-center">
+                    <input type="checkbox" id="remember" class="mr-2" />
+                    <label for="remember" class="text-600 text-sm cursor-pointer">Recordarme</label>
+                </div>
+                <a class="text-primary font-medium text-sm no-underline cursor-pointer hover:underline">¿Olvidaste tu contraseña?</a>
+            </div>
+
+            <p-button label="Iniciar Sesión" type="submit" [loading]="loading" 
+                      styleClass="w-full py-3 text-lg font-bold border-round-lg"
+                      [disabled]="loginForm.invalid"></p-button>
+
+            <div class="divider flex align-items-center my-3 text-500">
+                <span class="flex-grow-1 border-top-1 border-300"></span>
+                <span class="px-3 text-xs uppercase font-bold text-400">O ingresa con</span>
+                <span class="flex-grow-1 border-top-1 border-300"></span>
+            </div>
+
+            <p-button label="Ingresar con Google" icon="pi pi-google" (onClick)="loginWithGoogle()"
+                      styleClass="w-full py-3 text-lg font-bold border-round-lg p-button-outlined p-button-secondary bg-white hover:bg-gray-50"></p-button>
+
+        </form>
+
+        <div class="text-center mt-5 text-600">
+            ¿No tienes cuenta? <a routerLink="/register" class="text-primary font-bold no-underline hover:underline">Regístrate</a>
+        </div>
+    </div>
+</div>

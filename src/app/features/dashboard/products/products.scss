@@ -1,0 +1,183 @@
+.catalog-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.title {
+    font-size: 2rem;
+    font-weight: 800;
+    background: var(--p-primary-500);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.subtitle {
+    opacity: 0.6;
+    margin-top: 0.5rem;
+}
+
+.filters-bar {
+    border-radius: 16px;
+    transition: all 0.3s ease;
+}
+
+.gradient-btn {
+    background: var(--p-primary-500) !important;
+    border: none !important;
+    font-weight: 700;
+    color: white !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(var(--p-primary-500-rgb), 0.4) !important;
+    }
+}
+
+.content-card {
+    transition: box-shadow 0.3s ease;
+
+    &:hover {
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1) !important;
+    }
+}
+
+.text-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.5;
+    max-height: 3rem;
+}
+
+:host ::ng-deep {
+
+    // ESTILO DE PESTAÑAS (Standardizado)
+    .p-tabs {
+        background: transparent !important;
+
+        .p-tablist,
+        .p-tablist-content,
+        .p-tablist-tab-list {
+            background: transparent !important;
+            border-bottom: 1px solid var(--surface-border) !important;
+            margin-bottom: 0.5rem;
+
+            .p-tab {
+                background: transparent !important;
+                border: none !important;
+                border-bottom: 2px solid transparent !important;
+                color: var(--text-color-secondary) !important;
+                font-weight: 700;
+                padding: 1rem 1.5rem;
+                transition: all 0.2s ease;
+                margin-bottom: -1px;
+
+                &:hover:not(.p-tab-active) {
+                    color: var(--text-color) !important;
+                }
+
+                &.p-tab-active {
+                    color: var(--p-primary-500) !important;
+                    border-bottom-color: var(--p-primary-500) !important;
+                }
+            }
+        }
+
+        .p-tabpanels {
+            background: transparent !important;
+            padding: 0 !important;
+        }
+    }
+
+    // ESTILO DE TABLAS (Standardizado con User Access)
+    .p-datatable {
+        .p-datatable-header {
+            background: transparent !important;
+            border: none !important;
+        }
+
+        .p-datatable-thead>tr>th {
+            background: transparent !important;
+            color: var(--text-color) !important;
+            border-bottom: 1px solid var(--surface-border) !important;
+            font-weight: 700;
+            padding: 1.25rem 1rem;
+            text-align: left;
+        }
+
+        .p-datatable-tbody>tr {
+            background: transparent !important;
+            transition: background-color 0.2s ease;
+
+            &:hover {
+                background: var(--surface-hover) !important;
+            }
+
+            td {
+                background: transparent !important;
+                color: var(--text-color) !important;
+                border-bottom: 1px solid var(--surface-border) !important;
+                padding: 1.25rem 1rem;
+                vertical-align: middle;
+            }
+
+            &:last-child td {
+                border-bottom: none !important;
+            }
+        }
+    }
+
+    // ARREGLO DE ICONOS (Positioning)
+    .p-input-icon-left {
+        position: relative;
+        display: block;
+
+        i {
+            position: absolute;
+            top: 50%;
+            left: 1rem;
+            transform: translateY(-50%);
+            color: var(--p-primary-500) !important;
+            z-index: 1;
+        }
+
+        input {
+            padding: 0.75rem 1rem;
+            padding-left: 2.75rem !important;
+        }
+    }
+
+    .p-select {
+        border-radius: 12px;
+
+        .p-select-label {
+            padding: 0.75rem 1rem;
+        }
+
+        &.p-focus {
+            box-shadow: 0 0 0 2px rgba(var(--p-primary-500-rgb), 0.2) !important;
+        }
+    }
+}
+
+.price-tag {
+    background: rgba(var(--p-primary-500-rgb), 0.1);
+    color: var(--p-primary-500);
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-weight: 700;
+    display: inline-block;
+    border: 1px solid rgba(var(--p-primary-500-rgb), 0.2);
+}
+
+.stock-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+}
