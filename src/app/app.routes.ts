@@ -50,6 +50,10 @@ export const routes: Routes = [
         { 
           path: 'accounts', 
           loadComponent: () => import('./features/dashboard/accounts/accounts').then(m => m.Accounts) 
+        },
+        {
+          path: 'settings',
+          loadComponent: () => import('./features/dashboard/settings/settings').then(m => m.Settings)
         }
     ]
   },

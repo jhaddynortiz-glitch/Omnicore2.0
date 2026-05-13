@@ -1,0 +1,69 @@
+<p-toast></p-toast>
+
+<div class="settings-container animate-fadein">
+    <div class="flex align-items-center justify-content-between mb-5">
+        <div>
+            <h2 class="text-4xl font-bold m-0">Configuración</h2>
+            <p class="text-secondary mt-2">Gestiona la identidad de tu empresa y las integraciones de IA.</p>
+        </div>
+        <button pButton label="Guardar Cambios" icon="pi pi-save" class="p-button-lg shadow-2" [loading]="loading" (click)="saveSettings()"></button>
+    </div>
+    
+    <p-card styleClass="shadow-4">
+        <div class="p-fluid">
+            <!-- Sección 1: Identidad -->
+            <div class="section-header">
+                <i class="pi pi-building text-2xl"></i>
+                <h3 class="text-xl font-bold m-0">Identidad de la Empresa</h3>
+            </div>
+            
+            <div class="field">
+                <label for="name">Nombre Comercial</label>
+                <div class="p-input-icon-left">
+                    <i class="pi pi-tag"></i>
+                    <input pInputText id="name" [(ngModel)]="orgData.name" placeholder="Ej: Omni Core" />
+                </div>
+                <small class="helper-text">Este nombre se utilizará en las comunicaciones con tus clientes.</small>
+            </div>
+
+            <p-divider class="my-5"></p-divider>
+
+            <!-- Sección 2: WhatsApp -->
+            <div class="section-header">
+                <i class="pi pi-whatsapp text-2xl"></i>
+                <h3 class="text-xl font-bold m-0">WhatsApp Business API</h3>
+            </div>
+
+            <div class="grid">
+                <div class="col-12 md:col-6 field">
+                    <label for="whatsappPhoneId">WhatsApp Phone ID</label>
+                    <input pInputText id="whatsappPhoneId" [(ngModel)]="orgData.whatsappPhoneId" placeholder="ID de Meta" />
+                </div>
+                <div class="col-12 md:col-6 field">
+                    <label for="whatsappVerifyToken">Webhook Verify Token</label>
+                    <input pInputText id="whatsappVerifyToken" [(ngModel)]="orgData.whatsappVerifyToken" placeholder="Token de verificación" />
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="whatsappToken">Access Token (Permanente)</label>
+                <p-password [(ngModel)]="orgData.whatsappToken" [feedback]="false" [toggleMask]="true" styleClass="w-full" inputStyleClass="w-full" placeholder="EAAS..."></p-password>
+                <small class="helper-text">Proporcionado por Meta Developers Console.</small>
+            </div>
+
+            <p-divider class="my-5"></p-divider>
+
+            <!-- Sección 3: IA -->
+            <div class="section-header">
+                <i class="pi pi-sparkles text-2xl"></i>
+                <h3 class="text-xl font-bold m-0">Inteligencia Artificial</h3>
+            </div>
+
+            <div class="field">
+                <label for="openaiApiKey">OpenAI API Key</label>
+                <p-password [(ngModel)]="orgData.openaiApiKey" [feedback]="false" [toggleMask]="true" styleClass="w-full" inputStyleClass="w-full" placeholder="sk-..."></p-password>
+                <small class="helper-text">Necesaria para generar respuestas automáticas con GPT-4.</small>
+            </div>
+        </div>
+    </p-card>
+</div>

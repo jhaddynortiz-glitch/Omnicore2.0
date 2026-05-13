@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -7,7 +8,7 @@ import { Observable } from 'rxjs';
 })
 export class UsersService {
   private http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:3000/users';
+  private readonly apiUrl = `${environment.apiUrl}/users`;
 
   checkUserExists(email: string): Observable<{ exists: boolean, user: any }> {
     return this.http.get<{ exists: boolean, user: any }>(`${this.apiUrl}/check?email=${encodeURIComponent(email)}`);
