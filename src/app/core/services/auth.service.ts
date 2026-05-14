@@ -1,8 +1,8 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { environment } from '../../../environments/environment';
 import { tap, catchError, of, Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface Organization {
   id: string;
@@ -31,11 +31,11 @@ export interface AuthResponse {
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
-  private readonly apiUrl = `${environment.apiUrl}/auth`;
+  private readonly apiUrl = `${environment.apiUrl}auth`;
 
   // State
   private currentUser = signal<User | null>(null);
-  
+
   user = computed(() => this.currentUser());
   isAuthenticated = computed(() => !!this.currentUser());
   currentRole = computed(() => this.currentUser()?.activeRole || 'user');
