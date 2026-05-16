@@ -8,7 +8,7 @@ import { environment } from '../../../environments/environment';
 })
 export class UsersService {
   private http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiUrl}users`;
+  private readonly apiUrl = `${environment.apiUrl}/users`;
 
   checkUserExists(email: string): Observable<{ exists: boolean, user: any }> {
     return this.http.get<{ exists: boolean, user: any }>(`${this.apiUrl}/check?email=${encodeURIComponent(email)}`);
