@@ -31,7 +31,7 @@ export interface AuthResponse {
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
-  private readonly apiUrl = `${environment.apiUrl}auth`;
+  private readonly apiUrl = `${environment.apiUrl}/auth`;
 
   // State
   private currentUser = signal<User | null>(null);
