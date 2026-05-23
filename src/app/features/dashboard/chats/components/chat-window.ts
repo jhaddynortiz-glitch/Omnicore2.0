@@ -83,7 +83,7 @@ import { Contact, ChatMessage } from '../../../../core/services/chat.service';
                                 [ngClass]="msg.isFromMe ? 'bg-primary text-white border-noround-br shadow-1' : 'surface-card text-900 border-1 surface-border border-noround-bl shadow-1'">
                                 
                                 <!-- Mensaje de Texto normal -->
-                                @if (msg.type !== 'location') {
+                                @if (msg.type === 'text') {
                                     <p class="m-0 text-sm line-height-3 pr-4" style="word-break: break-word; white-space: pre-wrap;">{{msg.body}}</p>
                                 }
 
