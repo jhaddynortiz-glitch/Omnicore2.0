@@ -4,6 +4,13 @@ import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
 import { Subcategory } from './subcategories.service';
 
+export interface ProductAd {
+  id?: string;
+  adId: string;
+  platform: string;
+  createdAt?: string;
+}
+
 export interface Product {
   id?: string;
   name: string;
@@ -14,7 +21,7 @@ export interface Product {
   stock: number;
   isActive: boolean;
   subcategoryId?: string;
-  facebookAdId?: string;
+  ads?: ProductAd[];
   Subcategory?: Subcategory;
 }
 

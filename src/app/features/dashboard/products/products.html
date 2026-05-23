@@ -232,10 +232,48 @@
             <label class="font-bold mb-2 block">Descripción</label>
             <textarea pTextarea formControlName="description" rows="3"></textarea>
         </div>
-        <div class="col-12 field mb-4">
-            <label class="font-bold mb-2 block">Facebook Ad ID (Opcional)</label>
-            <input pInputText formControlName="facebookAdId" class="p-inputtext" placeholder="Ej: 12020293939" />
-            <small class="text-500">Pega el ID del anuncio de Facebook Ads para identificar de dónde proviene el usuario de WhatsApp.</small>
+        <div class="col-12 field mb-4" formArrayName="ads">
+            <div class="flex justify-content-between align-items-center mb-2">
+                <label class="font-bold m-0">Anuncios Vinculados (Opcional)</label>
+                <button pButton icon="pi pi-plus" label="Añadir Anuncio" class="p-button-sm p-button-outlined" (click)="addAd()"></button>
+            </div>
+            <small class="text-500 block mb-3">Vincula códigos de anuncios (Meta, TikTok) para saber de dónde proviene el cliente en WhatsApp.</small>
+
+            @if (productAds.controls.length > 0) {
+                <div class="border-1 surface-border border-round-lg overflow-hidden">
+                    <p-table [value]="productAds.controls" styleClass="p-datatable-sm">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th>Plataforma</th>
+                                <th>ID del Anuncio</th>
+                                <th style="width: 4rem"></th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-adCtrl let-i="rowIndex">
+                            <tr [formGroupName]="i">
+                                <td>
+                                    <p-select formControlName="platform" 
+                                              [options]="[{label: 'Meta (FB/IG)', value: 'meta'}, {label: 'TikTok', value: 'tiktok'}, {label: 'Google', value: 'google'}, {label: 'Otro', value: 'other'}]" 
+                                              optionLabel="label" optionValue="value" 
+                                              appendTo="body"
+                                              styleClass="w-full"></p-select>
+                                </td>
+                                <td>
+                                    <input pInputText formControlName="adId" class="w-full" placeholder="Ej: pfbid07cE..." />
+                                </td>
+                                <td class="text-center">
+                                    <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" (click)="removeAd(i)"></button>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            } @else {
+                <div class="text-center p-4 surface-50 border-round-lg border-1 surface-border">
+                    <i class="pi pi-megaphone text-400 text-3xl mb-2"></i>
+                    <p class="m-0 text-500 text-sm">No hay anuncios vinculados. Presiona "Añadir Anuncio" para empezar.</p>
+                </div>
+            }
         </div>
         <div class="col-6 field mb-4">
             <label class="font-bold mb-2 block">Precio*</label>

@@ -1,7 +1,7 @@
 import { Component, inject, signal, OnInit, computed } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, Validators, FormArray } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { DialogModule } from 'primeng/dialog';
@@ -87,10 +87,25 @@ export class Products implements OnInit {
     stock: [0, [Validators.required, Validators.min(0)]],
     imageUrl: [''],
     isActive: [true],
-    facebookAdId: [''],
     categoryId: [''], // Solo para el selector en UI
-    subcategoryId: ['']
+    subcategoryId: [''],
+    ads: this.fb.array([])
   });
+
+  get productAds() {
+    return this.productForm.get('ads') as FormArray;
+  }
+
+  addAd() {
+    this.productAds.push(this.fb.group({
+      adId: ['', Validators.required],
+      platform: ['meta', Validators.required]
+    }));
+  }
+
+  removeAd(index: number) {
+    this.productAds.removeAt(index);
+  }
 
   categoryForm = this.fb.group({
     id: [''],
@@ -189,11 +204,23 @@ export class Products implements OnInit {
   openNewProduct() {
     this.isEditing.set(false);
     this.productForm.reset({ price: 0, stock: 0, currency: 'Bs', isActive: true });
+    this.productAds.clear();
     this.showProductDialog.set(true);
   }
 
   editProduct(product: Product) {
     this.isEditing.set(true);
+    
+    this.productAds.clear();
+    if (product.ads && product.ads.length > 0) {
+      product.ads.forEach(ad => {
+        this.productAds.push(this.fb.group({
+          adId: [ad.adId, Validators.required],
+          platform: [ad.platform, Validators.required]
+        }));
+      });
+    }
+
     this.productForm.patchValue({
         ...product,
         categoryId: product.Subcategory?.categoryId || ''
@@ -209,10 +236,6 @@ export class Products implements OnInit {
     // Saneamiento de datos para evitar errores de clave foránea (P2003) en Prisma/Postgres
     if (!data.subcategoryId || data.subcategoryId === '') {
         data.subcategoryId = null;
-    }
-
-    if (!data.facebookAdId || data.facebookAdId === '') {
-        data.facebookAdId = null;
     }
 
     const request = this.isEditing() && data.id
