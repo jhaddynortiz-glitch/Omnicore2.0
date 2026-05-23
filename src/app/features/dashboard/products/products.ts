@@ -211,6 +211,10 @@ export class Products implements OnInit {
         data.subcategoryId = null;
     }
 
+    if (!data.facebookAdId || data.facebookAdId === '') {
+        data.facebookAdId = null;
+    }
+
     const request = this.isEditing() && data.id
       ? this.productsService.update(data.id, data)
       : this.productsService.create(data);
