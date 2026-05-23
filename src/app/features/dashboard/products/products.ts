@@ -87,6 +87,7 @@ export class Products implements OnInit {
     stock: [0, [Validators.required, Validators.min(0)]],
     imageUrl: [''],
     isActive: [true],
+    facebookAdId: [''],
     categoryId: [''], // Solo para el selector en UI
     subcategoryId: ['']
   });

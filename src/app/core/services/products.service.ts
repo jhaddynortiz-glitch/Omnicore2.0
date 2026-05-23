@@ -14,6 +14,7 @@ export interface Product {
   stock: number;
   isActive: boolean;
   subcategoryId?: string;
+  facebookAdId?: string;
   Subcategory?: Subcategory;
 }
 

@@ -232,6 +232,11 @@
             <label class="font-bold mb-2 block">Descripción</label>
             <textarea pTextarea formControlName="description" rows="3"></textarea>
         </div>
+        <div class="col-12 field mb-4">
+            <label class="font-bold mb-2 block">Facebook Ad ID (Opcional)</label>
+            <input pInputText formControlName="facebookAdId" class="p-inputtext" placeholder="Ej: 12020293939" />
+            <small class="text-500">Pega el ID del anuncio de Facebook Ads para identificar de dónde proviene el usuario de WhatsApp.</small>
+        </div>
         <div class="col-6 field mb-4">
             <label class="font-bold mb-2 block">Precio*</label>
             <p-inputNumber formControlName="price" mode="decimal" [minFractionDigits]="2"></p-inputNumber>
