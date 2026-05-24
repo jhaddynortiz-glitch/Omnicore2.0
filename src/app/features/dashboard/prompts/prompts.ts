@@ -9,6 +9,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { TooltipModule } from 'primeng/tooltip';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { PromptsService, Prompt } from '../../../core/services/prompts.service';
 
@@ -26,7 +27,8 @@ import { PromptsService, Prompt } from '../../../core/services/prompts.service';
     TextareaModule,
     ToggleSwitchModule,
     ToastModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    TooltipModule
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './prompts.html',
@@ -50,6 +52,31 @@ export class Prompts implements OnInit {
 
   isEditing = signal(false);
   saving = signal(false);
+
+  availableVariables = [
+    { label: 'Categorías Catálogo', syntax: '{{categorias}}' },
+    { label: 'Instrucción Catálogo', syntax: '{{productos}}' },
+    { label: 'Dirección Sucursales', syntax: '{{locales}}' },
+    { label: 'Puntos de Encuentro', syntax: '{{encuentros}}' }
+  ];
+
+  insertVariable(syntax: string) {
+    const textarea = document.getElementById('content') as HTMLTextAreaElement;
+    if (!textarea) return;
+
+    const startPos = textarea.selectionStart;
+    const endPos = textarea.selectionEnd;
+    const text = this.promptForm.get('content')?.value || '';
+    
+    const newText = text.substring(0, startPos) + syntax + text.substring(endPos, text.length);
+    this.promptForm.patchValue({ content: newText });
+
+    // Focus back and set cursor position
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(startPos + syntax.length, startPos + syntax.length);
+    }, 50);
+  }
 
   ngOnInit() {
     this.loadPrompts();

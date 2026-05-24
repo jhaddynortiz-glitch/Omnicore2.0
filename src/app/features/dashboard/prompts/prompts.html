@@ -74,12 +74,18 @@
 
         <div class="field mb-4">
             <label for="content" class="font-bold block mb-2">Contenido (Instrucciones del Sistema)</label>
-            <div class="prompt-helper mb-3 flex align-items-center gap-3 p-3 border-round-lg border-1 surface-border bg-black-alpha-10 shadow-1">
-                <i class="pi pi-info-circle text-primary text-2xl"></i>
-                <span class="text-xs line-height-3 text-900 font-medium">
-                    Usa <strong>{{ '{' }}{{ '{' }}productos{{ '}' }}{{ '}' }}</strong> para inyectar automáticamente tu catálogo de productos en esta posición del mensaje.
-                </span>
+            
+            <div class="flex flex-column gap-2 p-3 border-round-lg border-1 surface-border bg-black-alpha-10 mb-3 shadow-1">
+                <span class="font-bold text-xs text-900 block"><i class="pi pi-info-circle mr-1 text-primary"></i> Variables disponibles (Haz clic para insertar):</span>
+                <div class="flex flex-wrap gap-2 mt-1">
+                    @for (v of availableVariables; track v.syntax) {
+                        <span class="variable-tag shadow-1" (click)="insertVariable(v.syntax)" [pTooltip]="'Insertar ' + v.syntax">
+                            {{v.syntax}} ({{v.label}})
+                        </span>
+                    }
+                </div>
             </div>
+
             <textarea pTextarea id="content" formControlName="content" rows="10" 
                 class="prompt-textarea w-full"
                 placeholder="Eres un asistente que ayudara a los clientes..."></textarea>
