@@ -339,26 +339,11 @@ export class ProductDetail implements OnInit {
       : this.productsService.create(formData);
 
     request.subscribe({
-      next: (res: any) => {
-        this.messageService.add({ 
-          severity: 'success', 
-          summary: 'Guardado', 
-          detail: id ? 'El producto se ha actualizado correctamente' : 'El producto se ha creado correctamente' 
-        });
-        
-        if (!id && res && res.id) {
-          // Si es creación, actualizamos estados y cambiamos ruta para habilitar tabs
-          setTimeout(() => {
-            this.productId.set(res.id);
-            this.loadProductDetails(res.id);
-            this.saving.set(false);
-            this.router.navigate(['/dashboard/products', res.id]);
-          }, 1000);
-        } else {
-          setTimeout(() => {
-            this.router.navigate(['/dashboard/products']);
-          }, 1000);
-        }
+      next: () => {
+        this.messageService.add({ severity: 'success', summary: 'Guardado', detail: 'El producto se ha guardado correctamente' });
+        setTimeout(() => {
+          this.router.navigate(['/dashboard/products']);
+        }, 1000);
       },
       error: (err) => {
         console.error('Error saving product', err);
