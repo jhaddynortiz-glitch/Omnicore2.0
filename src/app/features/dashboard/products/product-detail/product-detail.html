@@ -17,7 +17,7 @@
         </div>
         <div class="flex gap-2">
             <button pButton label="Cancelar" class="p-button-rounded p-button-outlined p-button-plain px-4" (click)="goBack()"></button>
-            <button pButton icon="pi pi-check" label="Guardar Cambios" class="p-button-rounded gradient-btn px-4 shadow-2" (click)="saveProduct()" [loading]="saving()"></button>
+            <button pButton icon="pi pi-check" [label]="productId() ? 'Guardar Cambios' : 'Guardar Producto'" class="p-button-rounded gradient-btn px-4 shadow-2" (click)="saveProduct()" [loading]="saving()"></button>
         </div>
     </div>
 
@@ -33,11 +33,11 @@
                         <i class="pi pi-shopping-bag mr-2"></i>
                         <span>1. Nuevo o editar</span>
                     </p-tab>
-                    <p-tab value="1">
+                    <p-tab value="1" [disabled]="!productId()">
                         <i class="pi pi-bolt mr-2"></i>
                         <span>2. Disparadores</span>
                     </p-tab>
-                    <p-tab value="2">
+                    <p-tab value="2" [disabled]="!productId()">
                         <i class="pi pi-image mr-2"></i>
                         <span>3. Card</span>
                     </p-tab>
@@ -418,11 +418,6 @@
                 </p-tabpanels>
             </p-tabs>
 
-            <!-- Sticky Save Bar at Bottom -->
-            <div class="surface-card p-3 border-top-1 surface-border border-round-bottom-xl shadow-2 flex justify-content-end gap-2 mt-4">
-                <button pButton label="Cancelar" class="p-button-text p-button-plain px-4" (click)="goBack()"></button>
-                <button pButton icon="pi pi-check" label="Guardar Producto" class="gradient-btn px-4 shadow-2" (click)="saveProduct()" [loading]="saving()"></button>
-            </div>
         </div>
     }
 </div>
