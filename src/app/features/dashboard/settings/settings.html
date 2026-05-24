@@ -47,6 +47,10 @@
 
                         <p-divider class="my-5"></p-divider>
 
+                        <!-- Dummy fields to absorb browser autofill -->
+                        <input type="text" name="prevent_autofill_username" style="display:none;" autocomplete="username" />
+                        <input type="password" name="prevent_autofill_password" style="display:none;" autocomplete="current-password" />
+
                         <!-- Sección 2: WhatsApp -->
                         <div class="section-header">
                             <i class="pi pi-whatsapp text-2xl"></i>
@@ -56,17 +60,17 @@
                         <div class="grid">
                             <div class="col-12 md:col-6 field">
                                 <label for="whatsappPhoneId">WhatsApp Phone ID</label>
-                                <input pInputText id="whatsappPhoneId" [(ngModel)]="orgData().whatsappPhoneId" placeholder="ID de Meta" />
+                                <input pInputText id="whatsappPhoneId" [(ngModel)]="orgData().whatsappPhoneId" placeholder="ID de Meta" autocomplete="off" />
                             </div>
                             <div class="col-12 md:col-6 field">
                                 <label for="whatsappVerifyToken">Webhook Verify Token</label>
-                                <input pInputText id="whatsappVerifyToken" [(ngModel)]="orgData().whatsappVerifyToken" placeholder="Token de verificación" />
+                                <input pInputText id="whatsappVerifyToken" [(ngModel)]="orgData().whatsappVerifyToken" placeholder="Token de verificación" autocomplete="off" />
                             </div>
                         </div>
 
                         <div class="field">
                             <label for="whatsappToken">Access Token (Permanente)</label>
-                            <p-password [(ngModel)]="orgData().whatsappToken" [feedback]="false" [toggleMask]="true" styleClass="w-full" inputStyleClass="w-full" placeholder="EAAS..."></p-password>
+                            <p-password [(ngModel)]="orgData().whatsappToken" [feedback]="false" [toggleMask]="true" styleClass="w-full" inputStyleClass="w-full" placeholder="EAAS..." autocomplete="new-password"></p-password>
                             <small class="helper-text">Proporcionado por Meta Developers Console.</small>
                         </div>
 
@@ -80,7 +84,7 @@
 
                         <div class="field">
                             <label for="openaiApiKey">OpenAI API Key</label>
-                            <p-password [(ngModel)]="orgData().openaiApiKey" [feedback]="false" [toggleMask]="true" styleClass="w-full" inputStyleClass="w-full" placeholder="sk-..."></p-password>
+                            <p-password [(ngModel)]="orgData().openaiApiKey" [feedback]="false" [toggleMask]="true" styleClass="w-full" inputStyleClass="w-full" placeholder="sk-..." autocomplete="new-password"></p-password>
                             <small class="helper-text">Necesaria para generar respuestas automáticas con GPT-4.</small>
                         </div>
 
