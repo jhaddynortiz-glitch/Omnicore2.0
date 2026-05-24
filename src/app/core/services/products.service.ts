@@ -11,6 +11,14 @@ export interface ProductAd {
   createdAt?: string;
 }
 
+export interface ProductTrigger {
+  id?: string;
+  keyword: string;
+  response: string;
+  productId?: string;
+  createdAt?: string;
+}
+
 export interface Product {
   id?: string;
   name: string;
@@ -26,7 +34,7 @@ export interface Product {
   isDeliveryEnabled?: boolean;
   isLocalEnabled?: boolean;
   isMeetingEnabled?: boolean;
-  keywords?: string[];
+  triggers?: ProductTrigger[];
   cardDescription?: string;
   cardImageUrl?: string;
 }

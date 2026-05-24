@@ -69,7 +69,8 @@ export class ProductDetail implements OnInit {
   // --- Estado de UI ---
   activeTab = signal(0);
   newKeyword = signal<string>('');
-  keywordsList = signal<string[]>([]);
+  newTriggerResponse = signal<string>('');
+  triggersList = signal<any[]>([]);
 
   // --- Formulario Principal ---
   productForm = this.fb.group({
@@ -210,7 +211,7 @@ export class ProductDetail implements OnInit {
           });
         }
 
-        this.keywordsList.set(product.keywords || []);
+        this.triggersList.set(product.triggers || []);
 
         this.productForm.patchValue({
           ...product,
@@ -265,31 +266,43 @@ export class ProductDetail implements OnInit {
     }
   }
 
-  // --- Gestión de Palabras Clave (Chips) ---
-  addKeyword() {
-    const value = this.newKeyword().trim();
-    if (!value) return;
+  // --- Gestión de Disparadores y Respuestas ---
+  addTrigger() {
+    const keyword = this.newKeyword().trim();
+    const response = this.newTriggerResponse().trim();
 
-    // Acepta separar por comas para agregar varias de golpe
-    const words = value.split(',').map(w => w.trim().toLowerCase()).filter(w => w.length > 0);
-    const current = this.keywordsList();
-    
-    // Filtrar duplicados
-    const uniqueWords = words.filter(w => !current.includes(w));
-    
-    if (uniqueWords.length > 0) {
-      this.keywordsList.set([...current, ...uniqueWords]);
+    if (!keyword || !response) {
+      this.messageService.add({ 
+        severity: 'warn', 
+        summary: 'Campos incompletos', 
+        detail: 'Debes ingresar tanto la palabra/frase clave como su respuesta de disparador.' 
+      });
+      return;
     }
-    
+
+    const current = this.triggersList();
+
+    if (current.some(t => t.keyword.toLowerCase() === keyword.toLowerCase())) {
+      this.messageService.add({ 
+        severity: 'warn', 
+        summary: 'Palabra duplicada', 
+        detail: 'Esta palabra o frase clave ya tiene una respuesta asignada.' 
+      });
+      return;
+    }
+
+    this.triggersList.set([...current, { keyword, response }]);
     this.newKeyword.set('');
+    this.newTriggerResponse.set('');
+    this.messageService.add({ severity: 'success', summary: 'Añadido', detail: 'Disparador registrado' });
   }
 
-  removeKeyword(wordToRemove: string) {
-    this.keywordsList.set(this.keywordsList().filter(w => w !== wordToRemove));
+  removeTrigger(keyword: string) {
+    this.triggersList.set(this.triggersList().filter(t => t.keyword.toLowerCase() !== keyword.toLowerCase()));
   }
 
-  clearAllKeywords() {
-    this.keywordsList.set([]);
+  clearAllTriggers() {
+    this.triggersList.set([]);
   }
 
   // --- Inserción Rápida de Variables en el Textarea ---
@@ -330,8 +343,11 @@ export class ProductDetail implements OnInit {
       formData.subcategoryId = null;
     }
 
-    // Acoplar las palabras clave disparadoras
-    formData.keywords = this.keywordsList();
+    // Acoplar las respuestas de disparadores
+    formData.triggers = this.triggersList().map(t => ({
+      keyword: t.keyword,
+      response: t.response
+    }));
 
     const id = this.productId();
     const request = id 

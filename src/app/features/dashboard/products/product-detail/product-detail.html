@@ -170,47 +170,67 @@
                             <div class="col-12 md:col-6">
                                 <div class="surface-card p-4 shadow-2 border-round-xl border-1 surface-border flex flex-column gap-4 min-h-25rem">
                                     <div>
-                                        <h3 class="section-title m-0 mb-1"><i class="pi pi-bolt mr-2 text-primary"></i>Palabras Clave e Intenciones</h3>
-                                        <p class="text-500 text-sm m-0">Define frases o palabras clave que harán que la IA responda directamente mostrando este producto al cliente en WhatsApp.</p>
+                                        <h3 class="section-title m-0 mb-1"><i class="pi pi-bolt mr-2 text-primary"></i>Palabras Clave y Respuestas</h3>
+                                        <p class="text-500 text-sm m-0">Define palabras o frases clave para que el servidor responda de forma automática sin usar el bot.</p>
                                     </div>
 
-                                    <!-- Input para añadir palabras clave -->
-                                    <div class="flex gap-2">
-                                        <div class="flex-grow-1">
-                                            <span class="p-input-icon-left w-full">
-                                                <i class="pi pi-plus text-primary"></i>
-                                                <input pInputText type="text" [(ngModel)]="newKeyword" 
-                                                    [ngModelOptions]="{standalone: true}"
-                                                    (keyup.enter)="addKeyword()"
-                                                    placeholder="Ej: hamburguesa, chester, carne (Separado por comas)" class="w-full border-round-lg" />
-                                            </span>
+                                    <!-- Inputs para añadir disparador -->
+                                    <div class="flex flex-column gap-3 p-3 border-1 surface-border border-round-xl surface-50">
+                                        <div class="field m-0 p-fluid">
+                                            <label class="font-bold text-sm block mb-1">Palabra o Frase Clave</label>
+                                            <input pInputText type="text" [(ngModel)]="newKeyword" 
+                                                [ngModelOptions]="{standalone: true}"
+                                                placeholder="Ej: la paz" class="w-full border-round-lg" />
                                         </div>
-                                        <button pButton icon="pi pi-plus" label="Añadir" class="gradient-btn px-4 shadow-1 border-round-lg" (click)="addKeyword()"></button>
+                                        <div class="field m-0 p-fluid">
+                                            <label class="font-bold text-sm block mb-1">Respuesta del Disparador</label>
+                                            <textarea pTextarea [(ngModel)]="newTriggerResponse" 
+                                                [ngModelOptions]="{standalone: true}"
+                                                rows="3"
+                                                placeholder="Ej: ¡Genial! ✨ En La Paz, te llevamos tu pedido directo..." class="w-full border-round-lg"></textarea>
+                                        </div>
+                                        <button pButton icon="pi pi-plus" label="Añadir Disparador" class="gradient-btn px-4 shadow-1 border-round-lg align-self-end" (click)="addTrigger()"></button>
                                     </div>
 
-                                    <!-- Listado de Chips -->
+                                    <!-- Listado de Disparadores -->
                                     <div class="flex flex-column gap-2 flex-grow-1">
                                         <div class="flex justify-content-between align-items-center">
-                                            <span class="text-sm font-bold text-700">Palabras vinculadas ({{ keywordsList().length }})</span>
-                                            @if (keywordsList().length > 0) {
-                                                <button pButton label="Limpiar todo" class="p-button-text p-button-danger p-button-sm py-1 px-2" (click)="clearAllKeywords()"></button>
+                                            <span class="text-sm font-bold text-700">Disparadores Activos ({{ triggersList().length }})</span>
+                                            @if (triggersList().length > 0) {
+                                                <button pButton label="Limpiar todos" class="p-button-text p-button-danger p-button-sm py-1 px-2" (click)="clearAllTriggers()"></button>
                                             }
                                         </div>
 
-                                        @if (keywordsList().length > 0) {
-                                            <div class="keywords-chips-container p-3 border-1 surface-border border-round-xl surface-50 flex flex-wrap gap-2 align-content-start overflow-y-auto" style="max-height: 12rem;">
-                                                @for (word of keywordsList(); track word) {
-                                                    <div class="keyword-chip flex align-items-center gap-2 px-3 py-2 border-round-full shadow-1 text-sm font-semibold transition-colors">
-                                                        <span>{{ word }}</span>
-                                                        <i class="pi pi-times-circle cursor-pointer text-400 hover:text-danger text-base transition-colors" (click)="removeKeyword(word)"></i>
-                                                    </div>
-                                                }
+                                        @if (triggersList().length > 0) {
+                                            <div class="border-1 surface-border border-round-xl overflow-hidden shadow-1 overflow-y-auto" style="max-height: 16rem;">
+                                                <p-table [value]="triggersList()" styleClass="p-datatable-sm">
+                                                    <ng-template pTemplate="header">
+                                                        <tr>
+                                                            <th class="bg-surface-card border-bottom-1 surface-border">Disparador</th>
+                                                            <th class="bg-surface-card border-bottom-1 surface-border">Respuesta</th>
+                                                            <th class="bg-surface-card border-bottom-1 surface-border text-center" style="width: 3rem"></th>
+                                                        </tr>
+                                                    </ng-template>
+                                                    <ng-template pTemplate="body" let-trigger>
+                                                        <tr class="hover:surface-hover transition-colors">
+                                                            <td class="surface-border align-top font-bold text-primary">
+                                                                "{{ trigger.keyword }}"
+                                                            </td>
+                                                            <td class="surface-border align-top text-clamp-3 text-xs text-700" [pTooltip]="trigger.response">
+                                                                {{ trigger.response }}
+                                                            </td>
+                                                            <td class="text-center surface-border align-top">
+                                                                <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger p-button-sm" (click)="removeTrigger(trigger.keyword)"></button>
+                                                            </td>
+                                                        </tr>
+                                                    </ng-template>
+                                                </p-table>
                                             </div>
                                         } @else {
                                             <div class="flex-grow-1 flex flex-column align-items-center justify-content-center border-dashed border-2 surface-border border-round-xl p-4 text-center">
                                                 <i class="pi pi-hashtag text-400 text-3xl mb-2"></i>
-                                                <p class="m-0 text-500 text-sm font-medium">No hay palabras clave registradas.</p>
-                                                <small class="text-400 block mt-1">Escribe una palabra o frase arriba y presiona "Añadir".</small>
+                                                <p class="m-0 text-500 text-sm font-medium">No hay disparadores configurados.</p>
+                                                <small class="text-400 block mt-1">Escribe una palabra clave y su respuesta arriba para empezar.</small>
                                             </div>
                                         }
                                     </div>
