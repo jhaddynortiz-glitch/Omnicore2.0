@@ -13,19 +13,21 @@ export interface OrderItem {
 
 export interface Order {
   id?: string;
-  status: string; // PENDING, CONFIRMED, CANCELLED
+  status: string; // PENDING, CONFIRMED, CANCELLED, EN_COLA, ASIGNADO, ENTREGADO
   deliveryMethod?: string; // DELIVERY, LOCAL, MEETING
   deliveryCost: number;
   shippingAddress?: string;
   lat?: number;
   lng?: number;
-  total: number;
+  deliveryContactId?: string; // optional ID of assigned delivery contact
+  DeliveryContact?: any; // optional full delivery contact object from backend
   contactId: string;
   Contact?: any;
   storeLocationId?: string;
   StoreLocation?: any;
   meetingPointId?: string;
   MeetingPoint?: any;
+  total: number;
   items?: OrderItem[];
   createdAt?: string;
 }
@@ -49,8 +51,8 @@ export class OrdersService {
     return this.http.post<Order>(this.apiUrl, order);
   }
 
-  updateStatus(id: string, status: string): Observable<Order> {
-    return this.http.patch<Order>(`${this.apiUrl}/${id}/status`, { status });
+  updateStatus(id: string, status: string, deliveryContactId?: string): Observable<Order> {
+    return this.http.patch<Order>(`${this.apiUrl}/${id}/status`, { status, deliveryContactId });
   }
 
   delete(id: string): Observable<any> {

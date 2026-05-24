@@ -22,6 +22,8 @@ import { OrganizationsService } from '../../../core/services/organizations.servi
 import { AuthService } from '../../../core/services/auth.service';
 import { ChatService } from '../../../core/services/chat.service';
 import { LogisticsService, DeliveryZone, StoreLocation, MeetingPoint } from '../../../core/services/logistics.service';
+import { OperationContactsService, OperationContact } from '../../../core/services/operation-contacts.service';
+import { UsersService } from '../../../core/services/users.service';
 
 import * as L from 'leaflet';
 
@@ -121,6 +123,19 @@ export class Settings implements OnInit {
   private confirmationService = inject(ConfirmationService);
   private fb = inject(FormBuilder);
   private cdr = inject(ChangeDetectorRef);
+  private operationContactsService = inject(OperationContactsService);
+  private usersService = inject(UsersService);
+
+  // Operation Contacts
+  operationContacts = signal<OperationContact[]>([]);
+  orgMembers = signal<any[]>([]);
+  showContactDialog = false;
+  isEditingContact = false;
+  currentContactForm!: FormGroup;
+  contactTypes = [
+    { label: 'Administrador', value: 'ADMIN' },
+    { label: 'Repartidor / Delivery', value: 'DELIVERY' }
+  ];
 
   // General Settings
   orgData = signal<any>({
@@ -191,9 +206,20 @@ export class Settings implements OnInit {
     this.initForms();
     this.loadSettings();
     this.loadAllLogistics();
+    this.loadOperationContacts();
+    this.loadOrgMembers();
   }
 
   private initForms() {
+    // Operation Contact Form
+    this.currentContactForm = this.fb.group({
+      id: [''],
+      name: ['', Validators.required],
+      phoneNumber: ['', [Validators.required]],
+      type: ['ADMIN', Validators.required],
+      userId: [null]
+    });
+
     // Delivery Zone Form
     this.currentZoneForm = this.fb.group({
       id: [''],
@@ -708,6 +734,96 @@ export class Settings implements OnInit {
     this.logisticsService.deleteMeetingPoint(point.id!).subscribe(() => {
       this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Punto de encuentro eliminado' });
       this.loadMeetingPoints();
+    });
+  }
+
+  // ==========================================
+  // Actions: Operation Contacts
+  // ==========================================
+  loadOperationContacts() {
+    this.operationContactsService.getContacts().subscribe({
+      next: (data) => {
+        this.operationContacts.set(data);
+      },
+      error: () => {
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudieron cargar los contactos de operación' });
+      }
+    });
+  }
+
+  loadOrgMembers() {
+    this.usersService.getOrgMembers().subscribe({
+      next: (members) => {
+        this.orgMembers.set(members.map((m: any) => m.User).filter((u: any) => u !== null));
+      },
+      error: () => {
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudieron cargar los usuarios de la organización' });
+      }
+    });
+  }
+
+  openNewContact() {
+    this.isEditingContact = false;
+    this.currentContactForm.reset({
+      id: '',
+      name: '',
+      phoneNumber: '',
+      type: 'ADMIN',
+      userId: null
+    });
+    this.showContactDialog = true;
+  }
+
+  editContact(contact: OperationContact) {
+    this.isEditingContact = true;
+    this.currentContactForm.patchValue({
+      id: contact.id,
+      name: contact.name,
+      phoneNumber: contact.phoneNumber,
+      type: contact.type,
+      userId: contact.userId
+    });
+    this.showContactDialog = true;
+  }
+
+  saveContact() {
+    if (this.currentContactForm.invalid) return;
+
+    const data = this.currentContactForm.value;
+    const request = this.isEditingContact && data.id
+      ? this.operationContactsService.updateContact(data.id, data)
+      : this.operationContactsService.createContact(data);
+
+    request.subscribe({
+      next: () => {
+        this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Contacto de operación guardado' });
+        this.showContactDialog = false;
+        this.loadOperationContacts();
+      },
+      error: () => {
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo guardar el contacto de operación' });
+      }
+    });
+  }
+
+  deleteContact(contact: OperationContact) {
+    this.confirmationService.confirm({
+      message: `¿Estás seguro de eliminar el contacto "${contact.name}"?`,
+      header: 'Confirmación de Eliminación',
+      icon: 'pi pi-exclamation-triangle',
+      acceptButtonProps: { severity: 'danger', label: 'Eliminar', class: 'p-button-danger border-round-lg' },
+      rejectButtonProps: { label: 'Cancelar', class: 'p-button-text' },
+      accept: () => {
+        this.operationContactsService.deleteContact(contact.id!).subscribe({
+          next: () => {
+            this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Contacto eliminado correctamente' });
+            this.loadOperationContacts();
+          },
+          error: () => {
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo eliminar el contacto' });
+          }
+        });
+      }
     });
   }
 }

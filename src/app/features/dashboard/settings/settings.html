@@ -28,6 +28,10 @@
                     <i class="pi pi-users mr-2"></i>
                     <span>Puntos de Encuentro</span>
                 </p-tab>
+                <p-tab value="4">
+                    <i class="pi pi-phone mr-2"></i>
+                    <span>Contactos de Operación</span>
+                </p-tab>
             </p-tablist>
 
             <p-tabpanels>
@@ -304,6 +308,64 @@
                         }
                     </div>
                 </p-tabpanel>
+
+                <!-- PESTAÑA 4: CONTACTOS DE OPERACIÓN -->
+                <p-tabpanel value="4">
+                    <div class="pt-4">
+                        <div class="flex justify-content-between align-items-center mb-4">
+                            <div>
+                                <h3 class="text-xl font-bold m-0">Contactos de Operación</h3>
+                                <p class="text-secondary m-0">Configura los números de administradores (alertas de pedidos) y repartidores (asignación de entregas).</p>
+                            </div>
+                            <button pButton icon="pi pi-plus" label="Nuevo Contacto" class="p-button-rounded shadow-2" (click)="openNewContact()"></button>
+                        </div>
+
+                        <p-table [value]="operationContacts()" styleClass="p-datatable-sm shadow-1 border-round-xl border-1 surface-border" [tableStyle]="{'min-width': '100%'}">
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th class="py-3 px-3">Nombre</th>
+                                    <th class="py-3 px-3">Número de WhatsApp</th>
+                                    <th class="py-3 px-3">Tipo</th>
+                                    <th class="py-3 px-3">Usuario Asignado</th>
+                                    <th class="py-3 px-3 text-center" style="width: 150px">Acciones</th>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-contact>
+                                <tr class="hover:surface-hover transition-colors">
+                                    <td class="py-3 px-3 font-bold text-900">{{contact.name}}</td>
+                                    <td class="py-3 px-3 text-sm text-700">
+                                        <span class="flex align-items-center">
+                                            <i class="pi pi-whatsapp text-green-500 mr-2 text-base"></i>
+                                            {{contact.phoneNumber}}
+                                        </span>
+                                    </td>
+                                    <td class="py-3 px-3">
+                                        @if (contact.type === 'ADMIN') {
+                                            <span class="p-tag p-tag-rounded p-tag-danger px-2 text-xs">Administrador</span>
+                                        } @else {
+                                            <span class="p-tag p-tag-rounded p-tag-warning px-2 text-xs">Repartidor</span>
+                                        }
+                                    </td>
+                                    <td class="py-3 px-3 text-sm text-600">
+                                        {{contact.User?.fullName || 'Ninguno'}} @if (contact.User) { <span class="text-500">({{contact.User.email}})</span> }
+                                    </td>
+                                    <td class="py-3 px-3 text-center">
+                                        <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-text" (click)="editContact(contact)" pTooltip="Editar Contacto"></button>
+                                        <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" (click)="deleteContact(contact)" pTooltip="Eliminar"></button>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+
+                        @if (operationContacts().length === 0) {
+                            <div class="text-center p-5 surface-50 border-round-xl border-1 surface-border mt-4">
+                                <i class="pi pi-phone text-500 text-5xl mb-3"></i>
+                                <h4 class="m-0 text-700">No hay contactos de operación registrados</h4>
+                                <p class="text-500 text-sm mt-1">Registra administradores o repartidores para habilitar notificaciones y logística.</p>
+                            </div>
+                        }
+                    </div>
+                </p-tabpanel>
             </p-tabpanels>
         </p-tabs>
     </p-card>
@@ -479,5 +541,41 @@
     <ng-template pTemplate="footer">
         <button pButton label="Cancelar" class="p-button-text" (click)="showMeetingDialog = false"></button>
         <button pButton label="Guardar Punto" class="p-button-primary border-round-lg px-4" (click)="saveMeetingPoint()" [disabled]="currentMeetingForm.invalid"></button>
+    </ng-template>
+</p-dialog>
+
+<!-- ==========================================
+     MODAL: GESTIÓN DE CONTACTO DE OPERACIÓN
+     ========================================== -->
+<p-dialog [(visible)]="showContactDialog" [modal]="true" header="Gestión de Contacto de Operación" [style]="{width: '500px'}" styleClass="glass-modal">
+    <div [formGroup]="currentContactForm" class="p-fluid grid pt-3">
+        
+        <div class="col-12 field mb-3">
+            <label class="font-bold mb-2 block">Nombre Completo*</label>
+            <input pInputText formControlName="name" placeholder="Ej: Juan Pérez" />
+        </div>
+
+        <div class="col-12 field mb-3">
+            <label class="font-bold mb-2 block">Número de WhatsApp (con código de país)*</label>
+            <input pInputText formControlName="phoneNumber" placeholder="Ej: +59170012345" />
+            <small class="helper-text">Debe incluir el código del país sin espacios ni caracteres especiales.</small>
+        </div>
+
+        <div class="col-12 field mb-3">
+            <label class="font-bold mb-2 block">Tipo de Contacto*</label>
+            <p-select [options]="contactTypes" optionLabel="label" optionValue="value" formControlName="type" placeholder="Seleccionar Tipo"></p-select>
+        </div>
+
+        <div class="col-12 field mb-3">
+            <label class="font-bold mb-2 block">Vincular a Usuario del Sistema (Opcional)</label>
+            <p-select [options]="orgMembers()" optionLabel="fullName" optionValue="id" formControlName="userId" 
+                      [showClear]="true" placeholder="Ninguno / Sin usuario asignado"></p-select>
+            <small class="helper-text">Permite al repartidor iniciar sesión y ver sus pedidos asignados en el sistema.</small>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <button pButton label="Cancelar" class="p-button-text" (click)="showContactDialog = false"></button>
+        <button pButton label="Guardar Contacto" class="p-button-primary border-round-lg px-4" (click)="saveContact()" [disabled]="currentContactForm.invalid"></button>
     </ng-template>
 </p-dialog>

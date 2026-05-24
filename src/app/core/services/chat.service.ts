@@ -22,6 +22,7 @@ export interface Contact {
   organizationId: string;
   createdAt: string;
   messages: ChatMessage[];
+  orders?: any[];
 }
 
 @Injectable({

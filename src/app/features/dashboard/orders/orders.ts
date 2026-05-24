@@ -12,6 +12,8 @@ import { SelectModule } from 'primeng/select';
 import { DividerModule } from 'primeng/divider';
 import { MessageService } from 'primeng/api';
 import { OrdersService, Order } from '../../../core/services/orders.service';
+import { LogisticsService } from '../../../core/services/logistics.service';
+import { OperationContactsService, OperationContact } from '../../../core/services/operation-contacts.service';
 
 @Component({
   selector: 'app-orders',
@@ -82,19 +84,42 @@ export class Orders implements OnInit {
   private ordersService = inject(OrdersService);
   private messageService = inject(MessageService);
   private cdr = inject(ChangeDetectorRef);
+  private logisticsService = inject(LogisticsService);
+  private operationContactsService = inject(OperationContactsService);
 
   orders = signal<Order[]>([]);
   loading = signal(false);
   searchQuery = signal('');
 
+  selectedStatusFilter = signal<string>('ALL');
+  selectedCityFilter = signal<string>('ALL');
+  deliveryZones = signal<any[]>([]);
+  deliveryContacts = signal<OperationContact[]>([]);
+  selectedOrderToAssign = signal<Order | null>(null);
+  selectedDeliveryContactId = signal<string>('');
+  showAssignDialog = false;
+
   statusOptions = [
     { label: 'Pendiente', value: 'PENDING' },
-    { label: 'Confirmado', value: 'CONFIRMED' },
+    { label: 'En Cola', value: 'EN_COLA' },
+    { label: 'Asignado', value: 'ASIGNADO' },
+    { label: 'Entregado', value: 'ENTREGADO' },
+    { label: 'Cancelado', value: 'CANCELLED' }
+  ];
+
+  statusFilterOptions = [
+    { label: 'Todos los Estados', value: 'ALL' },
+    { label: 'Pendiente', value: 'PENDING' },
+    { label: 'En Cola', value: 'EN_COLA' },
+    { label: 'Asignado', value: 'ASIGNADO' },
+    { label: 'Entregado', value: 'ENTREGADO' },
     { label: 'Cancelado', value: 'CANCELLED' }
   ];
 
   ngOnInit() {
     this.loadOrders();
+    this.loadDeliveryZones();
+    this.loadDeliveryContacts();
   }
 
   loadOrders() {
@@ -112,6 +137,59 @@ export class Orders implements OnInit {
     });
   }
 
+  loadDeliveryZones() {
+    this.logisticsService.findAllDeliveryZones().subscribe({
+      next: (zones) => this.deliveryZones.set(zones),
+      error: () => {}
+    });
+  }
+
+  loadDeliveryContacts() {
+    this.operationContactsService.getContacts().subscribe({
+      next: (contacts) => {
+        this.deliveryContacts.set(contacts.filter(c => c.type === 'DELIVERY'));
+      },
+      error: () => {}
+    });
+  }
+
+  onStatusChange(order: Order, newStatus: string) {
+    if (newStatus === 'ASIGNADO') {
+      this.selectedOrderToAssign.set(order);
+      this.selectedDeliveryContactId.set(order.deliveryContactId || '');
+      this.showAssignDialog = true;
+    } else {
+      this.updateOrderStatus(order, newStatus);
+    }
+  }
+
+  confirmAssignment() {
+    const order = this.selectedOrderToAssign();
+    const contactId = this.selectedDeliveryContactId();
+    if (!order || !contactId) {
+      this.messageService.add({ severity: 'warn', summary: 'Advertencia', detail: 'Por favor, selecciona un repartidor' });
+      return;
+    }
+
+    this.ordersService.updateStatus(order.id!, 'ASIGNADO', contactId).subscribe({
+      next: () => {
+        this.messageService.add({ severity: 'success', summary: 'Pedido Asignado', detail: `Pedido de ${order.Contact?.name || 'Cliente'} asignado al repartidor` });
+        this.showAssignDialog = false;
+        this.selectedOrderToAssign.set(null);
+        this.loadOrders();
+      },
+      error: () => {
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo asignar el repartidor' });
+      }
+    });
+  }
+
+  cancelAssignment() {
+    this.showAssignDialog = false;
+    this.selectedOrderToAssign.set(null);
+    this.loadOrders();
+  }
+
   updateOrderStatus(order: Order, newStatus: string) {
     this.ordersService.updateStatus(order.id!, newStatus).subscribe({
       next: () => {
@@ -120,6 +198,7 @@ export class Orders implements OnInit {
       },
       error: () => {
         this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo actualizar el estado del pedido' });
+        this.loadOrders(); // revert dropdown
       }
     });
   }
@@ -138,21 +217,47 @@ export class Orders implements OnInit {
   }
 
   // --- Computed Metrics (Funnel Analysis) ---
+  cities = computed(() => {
+    const zoneCities = this.deliveryZones().map(z => z.city);
+    const orderCities = this.orders().map(o => o.StoreLocation?.city || o.MeetingPoint?.city).filter(Boolean);
+    const unique = Array.from(new Set([...zoneCities, ...orderCities]));
+    return [{ name: 'Todas las Ciudades', value: 'ALL' }, ...unique.map(c => ({ name: c, value: c }))];
+  });
+
   filteredOrders = computed(() => {
     const query = this.searchQuery().toLowerCase();
-    const list = this.orders();
-    if (!query) return list;
+    const status = this.selectedStatusFilter();
+    const city = this.selectedCityFilter();
+    let list = this.orders();
 
-    return list.filter(o => 
-      (o.Contact?.name || '').toLowerCase().includes(query) ||
-      (o.Contact?.phoneNumber || '').toLowerCase().includes(query) ||
-      (o.id || '').toLowerCase().includes(query)
-    );
+    if (status !== 'ALL') {
+      list = list.filter(o => o.status === status);
+    }
+
+    if (city !== 'ALL') {
+      list = list.filter(o => {
+        const orderCity = o.StoreLocation?.city || o.MeetingPoint?.city || '';
+        return orderCity.toLowerCase() === city.toLowerCase() || 
+               (o.shippingAddress || '').toLowerCase().includes(city.toLowerCase());
+      });
+    }
+
+    if (query) {
+      list = list.filter(o => 
+        (o.Contact?.name || '').toLowerCase().includes(query) ||
+        (o.Contact?.phoneNumber || '').toLowerCase().includes(query) ||
+        (o.id || '').toLowerCase().includes(query) ||
+        (o.shippingAddress || '').toLowerCase().includes(query) ||
+        (o.items || []).some(item => (item.Product?.name || '').toLowerCase().includes(query))
+      );
+    }
+
+    return list;
   });
 
   totalRevenue = computed(() => {
     return this.orders()
-      .filter(o => o.status === 'CONFIRMED')
+      .filter(o => o.status !== 'PENDING' && o.status !== 'CANCELLED')
       .reduce((sum, o) => sum + o.total, 0);
   });
 
@@ -160,8 +265,16 @@ export class Orders implements OnInit {
     return this.orders().filter(o => o.status === 'PENDING').length;
   });
 
-  confirmedCount = computed(() => {
-    return this.orders().filter(o => o.status === 'CONFIRMED').length;
+  enColaCount = computed(() => {
+    return this.orders().filter(o => o.status === 'EN_COLA').length;
+  });
+
+  asignadoCount = computed(() => {
+    return this.orders().filter(o => o.status === 'ASIGNADO').length;
+  });
+
+  entregadoCount = computed(() => {
+    return this.orders().filter(o => o.status === 'ENTREGADO').length;
   });
 
   cancelledCount = computed(() => {
@@ -171,7 +284,8 @@ export class Orders implements OnInit {
   conversionRate = computed(() => {
     const total = this.orders().length;
     if (total === 0) return 0;
-    return (this.confirmedCount() / total) * 100;
+    const successful = this.orders().filter(o => o.status !== 'PENDING' && o.status !== 'CANCELLED').length;
+    return (successful / total) * 100;
   });
 
   deliveryPercentage = computed(() => {

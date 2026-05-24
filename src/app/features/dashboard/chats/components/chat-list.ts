@@ -2,12 +2,13 @@ import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AvatarModule } from 'primeng/avatar';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { TooltipModule } from 'primeng/tooltip';
 import { Contact } from '../../../../core/services/chat.service';
 
 @Component({
   selector: 'app-chat-list',
   standalone: true,
-  imports: [CommonModule, AvatarModule, ProgressSpinnerModule],
+  imports: [CommonModule, AvatarModule, ProgressSpinnerModule, TooltipModule],
   template: `
     <div class="contacts-panel w-full md:w-25rem flex flex-column border-right-1 surface-border surface-ground h-full"
          [ngClass]="{'mobile-hidden': isContactSelected()}">
@@ -51,7 +52,10 @@ import { Contact } from '../../../../core/services/chat.service';
 
                             <div class="flex flex-column flex-auto overflow-hidden">
                                 <div class="flex justify-content-between align-items-center mb-1">
-                                    <span class="font-bold text-900 text-overflow-ellipsis white-space-nowrap overflow-hidden">{{chat.name === 'Usuario WhatsApp' ? '+' + chat.phoneNumber : chat.name}}</span>
+                                    <span class="font-bold text-900 text-overflow-ellipsis white-space-nowrap overflow-hidden flex align-items-center gap-2">
+                                        {{chat.name === 'Usuario WhatsApp' ? '+' + chat.phoneNumber : chat.name}}
+                                    <span class="status-flag {{ getFlagClass(chat.orders?.[0]?.status) }}" pTooltip="Pedido: {{ chat.orders?.[0]?.status }}" tooltipPosition="top"></span>
+                                    </span>
                                     <span class="text-xs text-500 white-space-nowrap ml-2">{{chat.messages[0]?.createdAt | date:'shortTime'}}</span>
                                 </div>
                                 
@@ -88,6 +92,25 @@ import { Contact } from '../../../../core/services/chat.service';
             display: none !important;
         }
     }
+    .status-flag {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+    .flag-purple {
+        background-color: #a855f7;
+        box-shadow: 0 0 6px #c084fc;
+    }
+    .flag-yellow {
+        background-color: #eab308;
+        box-shadow: 0 0 6px #fde047;
+    }
+    .flag-green {
+        background-color: #22c55e;
+        box-shadow: 0 0 6px #4ade80;
+    }
   `]
 })
 export class ChatList {
@@ -95,6 +118,19 @@ export class ChatList {
   selectedContactId = input<string>();
   isContactSelected = input<boolean>(false);
   isLoading = input<boolean>(false);
+
+  getFlagClass(status: string | undefined): string {
+    switch (status) {
+      case 'EN_COLA':
+        return 'flag-purple';
+      case 'ASIGNADO':
+        return 'flag-yellow';
+      case 'ENTREGADO':
+        return 'flag-green';
+      default:
+        return '';
+    }
+  }
   
   contactSelected = output<Contact>();
   addContact = output<void>();
