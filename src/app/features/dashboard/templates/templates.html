@@ -60,7 +60,7 @@
             <div class="field">
                 <label class="font-bold mb-2 block">Nombre de la Plantilla*</label>
                 <input pInputText formControlName="name" placeholder="Ej: Nota de Venta" />
-                <small class="text-500">Un nombre interno para identificar este mensaje.</small>
+                <small class="text-500 block mt-1">Un nombre interno para identificar este mensaje.</small>
             </div>
 
             <div class="field">
@@ -72,16 +72,23 @@
                 <!-- Variable Shortcut Tags -->
                 <div class="flex flex-wrap gap-2 mb-3">
                     @for (v of availableVariables; track v.syntax) {
-                        <span class="variable-tag shadow-1" (click)="insertVariable(v.syntax)" [pTooltip]="'Insertar ' + v.syntax">
+                        <span class="variable-tag shadow-1" 
+                              draggable="true" 
+                              (dragstart)="onDragStart($event, v.syntax)"
+                              (click)="insertVariable(v.syntax)" 
+                              [pTooltip]="'Insertar ' + v.syntax">
                             + {{v.label}}
                         </span>
                     }
                 </div>
 
-                <textarea pTextarea id="template-content" formControlName="content" rows="8" 
+                <textarea pTextarea id="template-content" formControlName="content" 
                           [placeholder]="placeholderText"
+                          style="height: 240px; resize: vertical;"
+                          (dragover)="onDragOver($event)"
+                          (drop)="onDrop($event)"
                           class="border-round-lg"></textarea>
-                <small class="helper-text">Usa los botones superiores para insertar variables dinámicas que serán reemplazadas en tiempo real por el sistema.</small>
+                <small class="helper-text block mt-1">Usa los botones superiores o arrástralos directamente al cuadro de texto para insertar variables dinámicas.</small>
             </div>
 
             <div class="flex align-items-center justify-content-between py-2 border-1 surface-border border-round-lg px-3 surface-50">

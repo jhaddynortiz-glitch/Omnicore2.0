@@ -231,6 +231,25 @@ export class Templates implements OnInit {
     }, 50);
   }
 
+  onDragStart(event: DragEvent, syntax: string) {
+    event.dataTransfer?.setData('text/plain', syntax);
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+  }
+
+  onDrop(event: DragEvent) {
+    // We let the browser insert the text natively at the correct drop cursor position.
+    // We wait a tiny tick for the DOM to update, then update our form control.
+    setTimeout(() => {
+      const textarea = event.target as HTMLTextAreaElement;
+      if (textarea) {
+        this.templateForm.patchValue({ content: textarea.value });
+      }
+    }, 50);
+  }
+
   saveTemplate() {
     if (this.templateForm.invalid) return;
 
