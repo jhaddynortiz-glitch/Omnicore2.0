@@ -149,10 +149,19 @@ import { TemplatesService, Template } from '../../../core/services/templates.ser
       outline: none;
       white-space: pre-wrap;
       word-break: break-word;
-      border: 1px solid var(--surface-border);
+      border: 1px solid #cbd5e1; /* Visible, noticeable border */
+      border-radius: 6px;
       background-color: var(--surface-card);
       color: var(--text-color);
       padding: 0.75rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .content-editable-editor:focus {
+      border-color: #FF634A !important;
+      box-shadow: 0 0 0 0.2rem rgba(255, 99, 74, 0.2) !important;
+    }
+    :host-context(html.app-dark) .content-editable-editor {
+      border: 1px solid #333333;
     }
     .content-editable-editor:empty:before {
       content: attr(placeholder);
@@ -165,19 +174,50 @@ import { TemplatesService, Template } from '../../../core/services/templates.ser
       color: #646468;
     }
     .variable-chip {
-      background-color: #FF634A; /* Opaline primary color */
-      color: white !important;
-      font-weight: 600;
-      padding: 0.15rem 0.4rem;
-      border-radius: 4px;
-      margin: 0px 3px;
+      background-color: #e2e8f0; /* Light slate background */
+      color: #334155 !important; /* Dark slate text */
+      font-weight: 500;
+      padding: 0.25rem 0.6rem;
+      border-radius: 9999px; /* Pill style */
+      margin: 0px 4px;
       display: inline-flex;
       align-items: center;
+      gap: 4px;
       font-size: 0.8rem;
       user-select: none;
       -webkit-user-drag: none;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+      border: 1px solid #cbd5e1;
       vertical-align: middle;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+    :host-context(html.app-dark) .variable-chip {
+      background-color: #334155;
+      color: #f1f5f9 !important;
+      border-color: #475569;
+    }
+    .chip-text {
+      line-height: 1;
+    }
+    .chip-close {
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      font-size: 0.75rem;
+      color: #64748b;
+      line-height: 1;
+      transition: background-color 0.2s, color 0.2s;
+    }
+    .chip-close:hover {
+      background-color: #cbd5e1;
+      color: #1e293b;
+    }
+    :host-context(html.app-dark) .chip-close:hover {
+      background-color: #475569;
+      color: #f1f5f9;
     }
   `]
 })
@@ -283,7 +323,7 @@ export class Templates implements OnInit {
 
     Object.keys(varMap).forEach(syntax => {
       const label = varMap[syntax];
-      const chipHtml = `<span class="variable-chip" contenteditable="false" data-syntax="${syntax}">+ ${label}</span>`;
+      const chipHtml = `<span class="variable-chip" contenteditable="false" data-syntax="${syntax}"><span class="chip-text">${label}</span><span class="chip-close">&times;</span></span>`;
       const escapedSyntax = syntax.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
       const regex = new RegExp(escapedSyntax, 'g');
       html = html.replace(regex, chipHtml);
@@ -343,7 +383,17 @@ export class Templates implements OnInit {
     chip.className = 'variable-chip';
     chip.contentEditable = 'false';
     chip.setAttribute('data-syntax', syntax);
-    chip.innerText = `+ ${label}`;
+    
+    const chipText = document.createElement('span');
+    chipText.className = 'chip-text';
+    chipText.innerText = label;
+    
+    const chipClose = document.createElement('span');
+    chipClose.className = 'chip-close';
+    chipClose.innerHTML = '&times;';
+    
+    chip.appendChild(chipText);
+    chip.appendChild(chipClose);
 
     // Get current selection
     const selection = window.getSelection();
@@ -386,6 +436,17 @@ export class Templates implements OnInit {
     this.updateFormControlFromEditable();
   }
 
+  onEditorClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (target && target.classList.contains('chip-close')) {
+      const chip = target.closest('.variable-chip');
+      if (chip) {
+        chip.remove();
+        this.updateFormControlFromEditable();
+      }
+    }
+  }
+
   onContentEditableDrop(event: DragEvent) {
     event.preventDefault();
     const syntax = event.dataTransfer?.getData('text/plain');
@@ -408,7 +469,17 @@ export class Templates implements OnInit {
     chip.className = 'variable-chip';
     chip.contentEditable = 'false';
     chip.setAttribute('data-syntax', syntax);
-    chip.innerText = `+ ${label}`;
+
+    const chipText = document.createElement('span');
+    chipText.className = 'chip-text';
+    chipText.innerText = label;
+    
+    const chipClose = document.createElement('span');
+    chipClose.className = 'chip-close';
+    chipClose.innerHTML = '&times;';
+    
+    chip.appendChild(chipText);
+    chip.appendChild(chipClose);
 
     let range: Range | null = null;
     

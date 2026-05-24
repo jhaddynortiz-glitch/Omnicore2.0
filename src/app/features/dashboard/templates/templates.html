@@ -87,6 +87,7 @@
                      contenteditable="true"
                      [attr.placeholder]="placeholderText"
                      (input)="onContentEditableInput($event)"
+                     (click)="onEditorClick($event)"
                      (dragover)="onDragOver($event)"
                      (drop)="onContentEditableDrop($event)"></div>
                 <small class="helper-text block mt-1">Usa los botones superiores o arrástralos directamente al cuadro de texto para insertar variables dinámicas.</small>
