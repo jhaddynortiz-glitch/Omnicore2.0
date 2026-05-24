@@ -23,6 +23,9 @@ export interface Product {
   subcategoryId?: string;
   ads?: ProductAd[];
   Subcategory?: Subcategory;
+  isDeliveryEnabled?: boolean;
+  isLocalEnabled?: boolean;
+  isMeetingEnabled?: boolean;
 }
 
 @Injectable({

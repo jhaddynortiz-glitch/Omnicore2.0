@@ -14,6 +14,7 @@ import { TabsModule } from 'primeng/tabs';
 import { SelectModule } from 'primeng/select';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { TooltipModule } from 'primeng/tooltip';
+import { DividerModule } from 'primeng/divider';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ProductsService, Product } from '../../../core/services/products.service';
 import { CategoriesService, Category } from '../../../core/services/categories.service';
@@ -38,7 +39,8 @@ import { ChatService } from '../../../core/services/chat.service';
     TabsModule,
     SelectModule,
     ToggleSwitchModule,
-    TooltipModule
+    TooltipModule,
+    DividerModule
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './products.html',
@@ -89,7 +91,10 @@ export class Products implements OnInit {
     isActive: [true],
     categoryId: [''], // Solo para el selector en UI
     subcategoryId: [''],
-    ads: this.fb.array([])
+    ads: this.fb.array([]),
+    isDeliveryEnabled: [true],
+    isLocalEnabled: [true],
+    isMeetingEnabled: [true]
   });
 
   get productAds() {
@@ -203,7 +208,15 @@ export class Products implements OnInit {
   // --- Métodos de Productos ---
   openNewProduct() {
     this.isEditing.set(false);
-    this.productForm.reset({ price: 0, stock: 0, currency: 'Bs', isActive: true });
+    this.productForm.reset({ 
+      price: 0, 
+      stock: 0, 
+      currency: 'Bs', 
+      isActive: true,
+      isDeliveryEnabled: true,
+      isLocalEnabled: true,
+      isMeetingEnabled: true
+    });
     this.productAds.clear();
     this.showProductDialog.set(true);
   }
