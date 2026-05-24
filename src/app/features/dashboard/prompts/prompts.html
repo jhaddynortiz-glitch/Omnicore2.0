@@ -76,25 +76,34 @@
             <label for="content" class="font-bold block mb-2">Contenido (Instrucciones del Sistema)</label>
             
             <div class="flex flex-column gap-3 p-3 border-round-lg border-1 surface-border bg-black-alpha-10 mb-3 shadow-1">
-                <div>
-                    <span class="font-bold text-xs text-900 block mb-2"><i class="pi pi-cog mr-1 text-primary"></i> Variables del Sistema:</span>
-                    <div class="flex flex-wrap gap-2">
-                        @for (v of systemVariables; track v.syntax) {
-                            <span class="variable-tag shadow-1" (click)="insertVariable(v.syntax)" [pTooltip]="v.label">
+                <span class="font-bold text-xs text-900 block mb-1">
+                    <i class="pi pi-info-circle mr-1 text-primary"></i> 
+                    Variables Disponibles (Haz clic para insertar):
+                </span>
+                
+                <!-- Variables del Sistema (Fijas) -->
+                <div class="flex flex-column gap-1">
+                    <span class="text-xs text-500 font-bold uppercase tracking-wider" style="font-size: 0.7rem;">Variables Fijas</span>
+                    <div class="flex flex-wrap gap-2 mt-1">
+                        @for (v of fixedVariables; track v.syntax) {
+                            <span class="variable-tag shadow-1" (click)="insertVariable(v.syntax)" [pTooltip]="v.label" style="cursor: pointer;">
                                 {{v.syntax}}
                             </span>
                         }
                     </div>
                 </div>
 
+                <!-- Plantillas Activas -->
                 @if (templateVariables().length > 0) {
-                    <p-divider styleClass="my-1"></p-divider>
-                    <div>
-                        <span class="font-bold text-xs text-900 block mb-2"><i class="pi pi-envelope mr-1 text-primary"></i> Plantillas Dinámicas:</span>
-                        <div class="flex flex-wrap gap-2">
-                            @for (v of templateVariables(); track v.syntax) {
-                                <span class="variable-tag shadow-1" (click)="insertVariable(v.syntax)" [pTooltip]="v.label" style="background-color: var(--blue-500);">
-                                    {{v.syntax}}
+                    <div class="flex flex-column gap-1">
+                        <span class="text-xs text-500 font-bold uppercase tracking-wider" style="font-size: 0.7rem;">Plantillas</span>
+                        <div class="flex flex-wrap gap-2 mt-1">
+                            @for (tpl of templateVariables(); track tpl.syntax) {
+                                <span class="variable-tag shadow-1 border-teal-500 font-semibold" 
+                                      (click)="insertVariable(tpl.syntax)" 
+                                      [pTooltip]="'Plantilla activa: ' + tpl.label"
+                                      style="cursor: pointer; background-color: #14b8a6; color: white !important;">
+                                    {{tpl.syntax}}
                                 </span>
                             }
                         </div>

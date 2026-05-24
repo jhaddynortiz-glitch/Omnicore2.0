@@ -10,7 +10,6 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
-import { DividerModule } from 'primeng/divider';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { PromptsService, Prompt } from '../../../core/services/prompts.service';
 import { TemplatesService } from '../../../core/services/templates.service';
@@ -30,8 +29,7 @@ import { TemplatesService } from '../../../core/services/templates.service';
     ToggleSwitchModule,
     ToastModule,
     ConfirmDialogModule,
-    TooltipModule,
-    DividerModule
+    TooltipModule
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './prompts.html',
@@ -57,14 +55,14 @@ export class Prompts implements OnInit {
   isEditing = signal(false);
   saving = signal(false);
 
-  systemVariables = [
+  fixedVariables = [
     { label: 'Categorías Catálogo', syntax: '{{categorias}}' },
     { label: 'Instrucción Catálogo', syntax: '{{productos}}' },
     { label: 'Dirección Sucursales', syntax: '{{locales}}' },
     { label: 'Puntos de Encuentro', syntax: '{{encuentros}}' }
   ];
 
-  templateVariables = signal<{ label: string, syntax: string }[]>([]);
+  templateVariables = signal<{ label: string; syntax: string }[]>([]);
 
   insertVariable(syntax: string) {
     const textarea = document.getElementById('content') as HTMLTextAreaElement;
@@ -93,13 +91,10 @@ export class Prompts implements OnInit {
     this.templatesService.findAll().subscribe({
       next: (data) => {
         const activeTemplates = data.filter(t => t.isActive);
-        const vars = activeTemplates.map(t => {
-          const snakeCaseName = t.name.toLowerCase().replace(/\s+/g, '_');
-          return {
-            label: `Contenido de la plantilla: ${t.name}`,
-            syntax: `{{${snakeCaseName}}}`
-          };
-        });
+        const vars = activeTemplates.map(t => ({
+          label: t.name,
+          syntax: `{{${t.name}}}`
+        }));
         this.templateVariables.set(vars);
       }
     });
