@@ -15,15 +15,15 @@
                     <i class="pi pi-building mr-2"></i>
                     <span>General</span>
                 </p-tab>
-                <p-tab value="1" *ngIf="orgData.isDeliveryEnabled">
+                <p-tab value="1" *ngIf="orgData().isDeliveryEnabled">
                     <i class="pi pi-map-marker mr-2"></i>
                     <span>Zonas de Delivery</span>
                 </p-tab>
-                <p-tab value="2" *ngIf="orgData.isLocalEnabled">
+                <p-tab value="2" *ngIf="orgData().isLocalEnabled">
                     <i class="pi pi-shopping-bag mr-2"></i>
                     <span>Locales / Sucursales</span>
                 </p-tab>
-                <p-tab value="3" *ngIf="orgData.isMeetingEnabled">
+                <p-tab value="3" *ngIf="orgData().isMeetingEnabled">
                     <i class="pi pi-users mr-2"></i>
                     <span>Puntos de Encuentro</span>
                 </p-tab>
@@ -41,7 +41,7 @@
                         
                         <div class="field">
                             <label for="name">Nombre Comercial</label>
-                            <input pInputText id="name" [(ngModel)]="orgData.name" placeholder="Ej: Omni Core" />
+                            <input pInputText id="name" [(ngModel)]="orgData().name" placeholder="Ej: Omni Core" />
                             <small class="helper-text">Este nombre se utilizará en las comunicaciones con tus clientes.</small>
                         </div>
 
@@ -56,17 +56,17 @@
                         <div class="grid">
                             <div class="col-12 md:col-6 field">
                                 <label for="whatsappPhoneId">WhatsApp Phone ID</label>
-                                <input pInputText id="whatsappPhoneId" [(ngModel)]="orgData.whatsappPhoneId" placeholder="ID de Meta" />
+                                <input pInputText id="whatsappPhoneId" [(ngModel)]="orgData().whatsappPhoneId" placeholder="ID de Meta" />
                             </div>
                             <div class="col-12 md:col-6 field">
                                 <label for="whatsappVerifyToken">Webhook Verify Token</label>
-                                <input pInputText id="whatsappVerifyToken" [(ngModel)]="orgData.whatsappVerifyToken" placeholder="Token de verificación" />
+                                <input pInputText id="whatsappVerifyToken" [(ngModel)]="orgData().whatsappVerifyToken" placeholder="Token de verificación" />
                             </div>
                         </div>
 
                         <div class="field">
                             <label for="whatsappToken">Access Token (Permanente)</label>
-                            <p-password [(ngModel)]="orgData.whatsappToken" [feedback]="false" [toggleMask]="true" styleClass="w-full" inputStyleClass="w-full" placeholder="EAAS..."></p-password>
+                            <p-password [(ngModel)]="orgData().whatsappToken" [feedback]="false" [toggleMask]="true" styleClass="w-full" inputStyleClass="w-full" placeholder="EAAS..."></p-password>
                             <small class="helper-text">Proporcionado por Meta Developers Console.</small>
                         </div>
 
@@ -80,7 +80,7 @@
 
                         <div class="field">
                             <label for="openaiApiKey">OpenAI API Key</label>
-                            <p-password [(ngModel)]="orgData.openaiApiKey" [feedback]="false" [toggleMask]="true" styleClass="w-full" inputStyleClass="w-full" placeholder="sk-..."></p-password>
+                            <p-password [(ngModel)]="orgData().openaiApiKey" [feedback]="false" [toggleMask]="true" styleClass="w-full" inputStyleClass="w-full" placeholder="sk-..."></p-password>
                             <small class="helper-text">Necesaria para generar respuestas automáticas con GPT-4.</small>
                         </div>
 
@@ -98,32 +98,32 @@
                                     <span class="font-bold block text-900">Delivery a Domicilio</span>
                                     <small class="text-secondary block mt-1">Calcula costos de envío por anillos de kilometraje desde un punto central.</small>
                                 </div>
-                                <p-toggleswitch [(ngModel)]="orgData.isDeliveryEnabled"></p-toggleswitch>
+                                <p-toggleswitch [(ngModel)]="orgData().isDeliveryEnabled"></p-toggleswitch>
                             </div>
                             <div class="col-12 md:col-4 flex align-items-center justify-content-between mb-4">
                                 <div class="pr-3">
                                     <span class="font-bold block text-900">Tiendas Físicas / Sucursales</span>
                                     <small class="text-secondary block mt-1">Permite a la IA informar direcciones de tiendas y horarios de atención.</small>
                                 </div>
-                                <p-toggleswitch [(ngModel)]="orgData.isLocalEnabled"></p-toggleswitch>
+                                <p-toggleswitch [(ngModel)]="orgData().isLocalEnabled"></p-toggleswitch>
                             </div>
                             <div class="col-12 md:col-4 flex align-items-center justify-content-between mb-4">
                                 <div class="pr-3">
                                     <span class="font-bold block text-900">Puntos de Encuentro</span>
                                     <small class="text-secondary block mt-1">Registra plazas o lugares públicos para entregas gratuitas u horarios pactados.</small>
                                 </div>
-                                <p-toggleswitch [(ngModel)]="orgData.isMeetingEnabled"></p-toggleswitch>
+                                <p-toggleswitch [(ngModel)]="orgData().isMeetingEnabled"></p-toggleswitch>
                             </div>
                         </div>
 
                         <div class="flex justify-content-end mt-4">
-                            <button pButton label="Guardar Configuración" icon="pi pi-save" class="p-button-lg shadow-2 px-5" [loading]="loading" (click)="saveSettings()"></button>
+                            <button pButton label="Guardar Configuración" icon="pi pi-save" class="p-button-lg shadow-2 px-5" [loading]="loading()" (click)="saveSettings()"></button>
                         </div>
                     </div>
                 </p-tabpanel>
 
                 <!-- PESTAÑA 1: ZONAS DE DELIVERY -->
-                <p-tabpanel value="1" *ngIf="orgData.isDeliveryEnabled">
+                <p-tabpanel value="1" *ngIf="orgData().isDeliveryEnabled">
                     <div class="pt-4">
                         <div class="flex justify-content-between align-items-center mb-4">
                             <div>
@@ -180,7 +180,7 @@
                 </p-tabpanel>
 
                 <!-- PESTAÑA 2: LOCALES / SUCURSALES -->
-                <p-tabpanel value="2" *ngIf="orgData.isLocalEnabled">
+                <p-tabpanel value="2" *ngIf="orgData().isLocalEnabled">
                     <div class="pt-4">
                         <div class="flex justify-content-between align-items-center mb-4">
                             <div>
@@ -233,7 +233,7 @@
                 </p-tabpanel>
 
                 <!-- PESTAÑA 3: PUNTOS DE ENCUENTRO -->
-                <p-tabpanel value="3" *ngIf="orgData.isMeetingEnabled">
+                <p-tabpanel value="3" *ngIf="orgData().isMeetingEnabled">
                     <div class="pt-4">
                         <div class="flex justify-content-between align-items-center mb-4">
                             <div>

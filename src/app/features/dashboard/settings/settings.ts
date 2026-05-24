@@ -120,7 +120,7 @@ export class Settings implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
   // General Settings
-  orgData: any = {
+  orgData = signal<any>({
     name: '',
     whatsappToken: '',
     whatsappPhoneId: '',
@@ -129,9 +129,9 @@ export class Settings implements OnInit {
     isDeliveryEnabled: false,
     isLocalEnabled: false,
     isMeetingEnabled: false
-  };
+  });
 
-  loading = false;
+  loading = signal(false);
   activeTab = '0';
 
   onTabChange(event: string | number | undefined) {
@@ -255,10 +255,10 @@ export class Settings implements OnInit {
 
     this.orgService.getById(orgId).subscribe({
       next: (data) => {
-        this.orgData = {
-          ...this.orgData,
+        this.orgData.set({
+          ...this.orgData(),
           ...data
-        };
+        });
         this.cdr.detectChanges();
       },
       error: () => {
@@ -272,17 +272,17 @@ export class Settings implements OnInit {
     const orgId = user?.activeOrganizationId;
     if (!orgId) return;
 
-    this.loading = true;
-    this.orgService.update(orgId, this.orgData).subscribe({
+    this.loading.set(true);
+    this.orgService.update(orgId, this.orgData()).subscribe({
       next: (updated) => {
         this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Configuración general guardada' });
-        this.orgData = { ...this.orgData, ...updated };
-        this.loading = false;
+        this.orgData.set({ ...this.orgData(), ...updated });
+        this.loading.set(false);
         this.cdr.detectChanges();
       },
       error: () => {
         this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo guardar la configuración' });
-        this.loading = false;
+        this.loading.set(false);
         this.cdr.detectChanges();
       }
     });
