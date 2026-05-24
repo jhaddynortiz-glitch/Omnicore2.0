@@ -28,7 +28,9 @@ export class Dashboard implements OnInit {
   private menuItemsList: MenuItem[] = [
     { label: 'Dashboard', icon: 'pi pi-home', route: '/dashboard' },
     { label: 'Chats', icon: 'pi pi-comments', route: '/dashboard/chats' },
+    { label: 'Pedidos', icon: 'pi pi-shopping-cart', route: '/dashboard/orders' },
     { label: 'Catálogo', icon: 'pi pi-shopping-bag', route: '/dashboard/products' },
+    { label: 'Plantillas', icon: 'pi pi-envelope', route: '/dashboard/templates' },
     { label: 'Prompts', icon: 'pi pi-bolt', route: '/dashboard/prompts' },
     { label: 'Organizaciones', icon: 'pi pi-building', route: '/dashboard/organizations' },
     { label: 'User Access', icon: 'pi pi-shield', route: '/dashboard/user-access' },
@@ -61,7 +63,7 @@ export class Dashboard implements OnInit {
     // Filtros por rol dentro de organización
     if (role === 'admin' || role === 'super-admin') {
       return this.menuItemsList.filter(item =>
-        ['Dashboard', 'Chats', 'Organizaciones', 'User Access', 'Catálogo', 'Prompts', 'Configuración'].includes(item.label)
+        ['Dashboard', 'Chats', 'Organizaciones', 'User Access', 'Catálogo', 'Prompts', 'Configuración', 'Pedidos', 'Plantillas'].includes(item.label)
       );
     }
 

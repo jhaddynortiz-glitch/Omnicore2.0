@@ -54,6 +54,14 @@ export const routes: Routes = [
         {
           path: 'settings',
           loadComponent: () => import('./features/dashboard/settings/settings').then(m => m.Settings)
+        },
+        {
+          path: 'orders',
+          loadComponent: () => import('./features/dashboard/orders/orders').then(m => m.Orders)
+        },
+        {
+          path: 'templates',
+          loadComponent: () => import('./features/dashboard/templates/templates').then(m => m.Templates)
         }
     ]
   },

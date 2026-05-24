@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { CardModule } from 'primeng/card';
@@ -117,6 +117,7 @@ export class Settings implements OnInit {
   private logisticsService = inject(LogisticsService);
   private messageService = inject(MessageService);
   private fb = inject(FormBuilder);
+  private cdr = inject(ChangeDetectorRef);
 
   // General Settings
   orgData: any = {
@@ -258,6 +259,7 @@ export class Settings implements OnInit {
           ...this.orgData,
           ...data
         };
+        this.cdr.detectChanges();
       },
       error: () => {
         this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo cargar la configuración' });
@@ -276,10 +278,12 @@ export class Settings implements OnInit {
         this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Configuración general guardada' });
         this.orgData = { ...this.orgData, ...updated };
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo guardar la configuración' });
         this.loading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -566,15 +570,18 @@ export class Settings implements OnInit {
     const file: File = event.target.files[0];
     if (file) {
       this.isUploadingStoreImage = true;
+      this.cdr.detectChanges();
       this.chatService.uploadFile(file).subscribe({
         next: (res) => {
           this.currentStoreForm.patchValue({ imageUrl: res.url });
           this.isUploadingStoreImage = false;
           this.messageService.add({ severity: 'success', summary: 'Imagen subida', detail: 'La imagen se cargó correctamente' });
+          this.cdr.detectChanges();
         },
         error: () => {
           this.isUploadingStoreImage = false;
           this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo subir la imagen' });
+          this.cdr.detectChanges();
         }
       });
     }

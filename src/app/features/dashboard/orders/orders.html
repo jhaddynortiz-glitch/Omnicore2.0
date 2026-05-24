@@ -1,0 +1,258 @@
+<p-toast></p-toast>
+
+<div class="orders-container p-4 animate-fadein">
+    <div class="mb-4">
+        <h1 class="text-4xl font-bold m-0">Gestión de Pedidos</h1>
+        <p class="text-secondary mt-1">Supervisa las ventas, actualiza los estados de entrega y analiza tu embudo de conversión.</p>
+    </div>
+
+    <!-- ANÁLISIS DE EMBUDO (METRIC CARDS) -->
+    <div class="grid mb-5">
+        <!-- 1. Ingresos Confirmados -->
+        <div class="col-12 md:col-3">
+            <div class="metric-card flex flex-column justify-content-between h-full">
+                <div>
+                    <span class="text-secondary font-semibold text-sm uppercase block">Ingresos Confirmados</span>
+                    <h2 class="text-3xl font-extrabold m-0 mt-2 text-900">{{totalRevenue() | number:'1.2-2'}} Bs</h2>
+                </div>
+                <div class="text-green-500 font-bold text-sm mt-3 flex align-items-center gap-1">
+                    <i class="pi pi-check-circle"></i>
+                    <span>Cerrado y Cobrado</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Estados del Embudo (Funnel) -->
+        <div class="col-12 md:col-3">
+            <div class="metric-card flex flex-column justify-content-between h-full">
+                <div>
+                    <span class="text-secondary font-semibold text-sm uppercase block">Estados del Pedido</span>
+                    <div class="flex justify-content-between align-items-center mt-3 text-sm">
+                        <span class="text-secondary">Pendientes:</span>
+                        <span class="font-bold text-900">{{pendingCount()}}</span>
+                    </div>
+                    <div class="flex justify-content-between align-items-center mt-2 text-sm">
+                        <span class="text-secondary">Confirmados:</span>
+                        <span class="font-bold text-green-500">{{confirmedCount()}}</span>
+                    </div>
+                    <div class="flex justify-content-between align-items-center mt-2 text-sm">
+                        <span class="text-secondary">Cancelados:</span>
+                        <span class="font-bold text-red-500">{{cancelledCount()}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Tasa de Conversión -->
+        <div class="col-12 md:col-3">
+            <div class="metric-card flex flex-column justify-content-between h-full">
+                <div>
+                    <span class="text-secondary font-semibold text-sm uppercase block">Tasa de Conversión</span>
+                    <h2 class="text-3xl font-extrabold m-0 mt-2 text-primary">{{conversionRate() | number:'1.1-1'}}%</h2>
+                </div>
+                <div class="mt-3">
+                    <div class="funnel-bar-container">
+                        <div class="funnel-bar-fill" [style.width.%]="conversionRate()" [style.background-color]="'#FF634A'"></div>
+                    </div>
+                    <small class="text-secondary block mt-1">Porcentaje de éxito sobre total de contactos.</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Distribución de Entregas -->
+        <div class="col-12 md:col-3">
+            <div class="metric-card flex flex-column justify-content-between h-full">
+                <div>
+                    <span class="text-secondary font-semibold text-sm uppercase block">Métodos de Entrega</span>
+                    
+                    <div class="mt-3">
+                        <div class="flex justify-content-between text-xs mb-1">
+                            <span>Delivery</span>
+                            <span class="font-bold">{{deliveryPercentage() | number:'1.0-0'}}%</span>
+                        </div>
+                        <div class="funnel-bar-container mb-2" style="height: 6px;">
+                            <div class="funnel-bar-fill" [style.width.%]="deliveryPercentage()" [style.background-color]="'#3B82F6'"></div>
+                        </div>
+                        
+                        <div class="flex justify-content-between text-xs mb-1">
+                            <span>Retiro Local</span>
+                            <span class="font-bold">{{localPercentage() | number:'1.0-0'}}%</span>
+                        </div>
+                        <div class="funnel-bar-container mb-2" style="height: 6px;">
+                            <div class="funnel-bar-fill" [style.width.%]="localPercentage()" [style.background-color]="'#10B981'"></div>
+                        </div>
+
+                        <div class="flex justify-content-between text-xs mb-1">
+                            <span>Encuentros</span>
+                            <span class="font-bold">{{meetingPercentage() | number:'1.0-0'}}%</span>
+                        </div>
+                        <div class="funnel-bar-container" style="height: 6px;">
+                            <div class="funnel-bar-fill" [style.width.%]="meetingPercentage()" [style.background-color]="'#F59E0B'"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BUSCADOR -->
+    <div class="flex gap-3 mb-4 p-4 shadow-2 surface-card border-round-xl border-1 surface-border align-items-center">
+        <div class="flex-grow-1">
+            <span class="p-input-icon-left w-full">
+                <i class="pi pi-search" style="color: var(--primary-color);"></i>
+                <input pInputText type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" 
+                       placeholder="Buscar por cliente, número de teléfono o ID de pedido..." class="w-full border-round-lg" />
+            </span>
+        </div>
+        <button pButton icon="pi pi-refresh" class="p-button-outlined border-round-lg" pTooltip="Refrescar lista" (click)="loadOrders()"></button>
+    </div>
+
+    <!-- TABLA DE PEDIDOS -->
+    <div class="surface-card p-4 shadow-2 border-round-xl border-1 surface-border">
+        <p-table [value]="filteredOrders()" dataKey="id" [loading]="loading()" styleClass="p-datatable-sm" [tableStyle]="{'min-width': '100%'}">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="width: 3rem"></th>
+                    <th class="py-3 px-3">ID Pedido</th>
+                    <th class="py-3 px-3">Cliente</th>
+                    <th class="py-3 px-3">Teléfono</th>
+                    <th class="py-3 px-3">Total</th>
+                    <th class="py-3 px-3">Método Entrega</th>
+                    <th class="py-3 px-3 text-center" style="width: 180px">Estado</th>
+                    <th class="py-3 px-3 text-center" style="width: 80px"></th>
+                </tr>
+            </ng-template>
+            
+            <ng-template pTemplate="body" let-order let-expanded="expanded">
+                <tr class="hover:surface-hover transition-colors">
+                    <td class="py-3">
+                        <button type="button" pButton [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" 
+                                class="p-button-text p-button-rounded p-button-plain p-button-sm" [pRowToggler]="order"></button>
+                    </td>
+                    <td class="py-3 px-3 font-semibold text-xs text-700">
+                        {{order.id.substring(0,8)}}...
+                    </td>
+                    <td class="py-3 px-3">
+                        <span class="font-bold text-900">{{order.Contact?.name || 'Sin nombre'}}</span>
+                    </td>
+                    <td class="py-3 px-3 text-sm text-700">
+                        {{order.Contact?.phoneNumber}}
+                    </td>
+                    <td class="py-3 px-3 font-bold text-primary">
+                        {{order.total | number:'1.2-2'}} Bs
+                    </td>
+                    <td class="py-3 px-3 text-sm">
+                        @if (order.deliveryMethod === 'DELIVERY') {
+                            <span class="p-tag p-tag-rounded p-tag-info px-2">Delivery</span>
+                        } @else if (order.deliveryMethod === 'LOCAL') {
+                            <span class="p-tag p-tag-rounded p-tag-success px-2">Sucursal</span>
+                        } @else if (order.deliveryMethod === 'MEETING') {
+                            <span class="p-tag p-tag-rounded p-tag-warning px-2">Encuentro</span>
+                        } @else {
+                            <span class="text-500">No definido</span>
+                        }
+                    </td>
+                    <td class="py-3 px-3 text-center">
+                        <p-select [options]="statusOptions" [(ngModel)]="order.status" 
+                                  (onChange)="updateOrderStatus(order, $event.value)" 
+                                  optionLabel="label" optionValue="value" 
+                                  styleClass="status-select border-round-lg text-sm" appendTo="body"></p-select>
+                    </td>
+                    <td class="py-3 px-3 text-center">
+                        <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" (click)="deleteOrder(order)" pTooltip="Eliminar Pedido"></button>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <!-- DETALLE EXPANDIDO DE LA FILA -->
+            <ng-template pTemplate="rowexpansion" let-order>
+                <tr>
+                    <td colspan="8" class="p-4 surface-50">
+                        <div class="expanded-details-card animate-fadein">
+                            <h4 class="m-0 mb-3 text-900"><i class="pi pi-shopping-bag mr-2 text-primary"></i>Detalle de Productos</h4>
+                            
+                            <!-- Items List Table -->
+                            <p-table [value]="order.items || []" styleClass="p-datatable-sm shadow-1 border-round-lg overflow-hidden mb-4">
+                                <ng-template pTemplate="header">
+                                    <tr>
+                                        <th class="py-2 px-3">Producto</th>
+                                        <th class="py-2 px-3">Precio Unitario</th>
+                                        <th class="py-2 px-3 text-center">Cantidad</th>
+                                        <th class="py-2 px-3 text-right">Subtotal</th>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="body" let-item>
+                                    <tr>
+                                        <td class="py-2 px-3 font-semibold text-900">{{item.Product?.name || 'Producto Eliminado'}}</td>
+                                        <td class="py-2 px-3 text-700">{{item.price}} Bs</td>
+                                        <td class="py-2 px-3 text-center text-900 font-bold">{{item.quantity}}</td>
+                                        <td class="py-2 px-3 text-right font-bold text-700">{{item.price * item.quantity | number:'1.2-2'}} Bs</td>
+                                    </tr>
+                                </ng-template>
+                            </p-table>
+
+                            <!-- Entrega / Logística Info -->
+                            <h4 class="m-0 mb-3 text-900"><i class="pi pi-map-marker mr-2 text-primary"></i>Información de Entrega</h4>
+                            
+                            <div class="grid pt-2 text-sm text-700">
+                                @if (order.deliveryMethod === 'DELIVERY') {
+                                    <div class="col-12 md:col-6 mb-2">
+                                        <span class="font-bold text-900 block mb-1">Dirección de Envío:</span>
+                                        <span>{{order.shippingAddress || 'Sin dirección registrada'}}</span>
+                                    </div>
+                                    <div class="col-12 md:col-6 mb-2">
+                                        <span class="font-bold text-900 block mb-1">Costo de Envío:</span>
+                                        <span class="font-bold text-primary">{{order.deliveryCost}} Bs</span>
+                                    </div>
+                                    @if (order.lat && order.lng) {
+                                        <div class="col-12 mb-2">
+                                            <span class="font-bold text-900 block mb-1">Ubicación GPS (WhatsApp Pin):</span>
+                                            <a [href]="getGoogleMapsUrl(order.lat, order.lng)" target="_blank" class="p-button p-button-sm p-button-outlined border-round-lg text-primary flex align-items-center gap-2 max-w-max no-underline">
+                                                <i class="pi pi-map"></i> Ver en Google Maps ({{order.lat | number:'1.4-4'}}, {{order.lng | number:'1.4-4'}})
+                                            </a>
+                                        </div>
+                                    }
+                                } @else if (order.deliveryMethod === 'LOCAL') {
+                                    <div class="col-12 mb-2">
+                                        <span class="font-bold text-900 block mb-1">Retiro en Tienda / Sucursal:</span>
+                                        <div class="flex align-items-center gap-2 mt-1">
+                                            <i class="pi pi-building text-primary"></i>
+                                            <div>
+                                                <span class="font-bold block text-800">{{order.StoreLocation?.city}} - {{order.StoreLocation?.address}}</span>
+                                                <small class="text-secondary">{{order.StoreLocation?.description}}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                } @else if (order.deliveryMethod === 'MEETING') {
+                                    <div class="col-12 mb-2">
+                                        <span class="font-bold text-900 block mb-1">Punto de Encuentro Coordinado:</span>
+                                        <div class="flex align-items-center gap-2 mt-1">
+                                            <i class="pi pi-users text-primary"></i>
+                                            <div>
+                                                <span class="font-bold block text-800">{{order.MeetingPoint?.city}} - {{order.MeetingPoint?.name}}</span>
+                                                <span class="block text-700">{{order.MeetingPoint?.address}}</span>
+                                                <span class="p-tag p-tag-rounded p-tag-warning mt-1 text-xs px-2">{{order.MeetingPoint?.schedule}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                } @else {
+                                    <div class="col-12 text-500">
+                                        No se ha configurado ningún método de entrega para este pedido.
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+        
+        @if (filteredOrders().length === 0 && !loading()) {
+            <div class="text-center p-5 surface-50 border-round-xl border-1 surface-border mt-4">
+                <i class="pi pi-shopping-cart text-500 text-5xl mb-3"></i>
+                <h4 class="m-0 text-700">No se encontraron pedidos</h4>
+                <p class="text-500 text-sm mt-1">Prueba refinando tu búsqueda o refrescando la lista.</p>
+            </div>
+        }
+    </div>
+</div>

@@ -69,6 +69,61 @@ body {
     }
 }
 
+// Estilo universal y forzado para ToggleSwitch en toda la aplicación (Light y Dark)
+.p-toggleswitch {
+    display: inline-flex;
+    width: 44px !important;
+    height: 24px !important;
+    position: relative;
+    cursor: pointer;
+    
+    .p-toggleswitch-input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+        position: absolute;
+    }
+    
+    // El slider (pista)
+    .p-toggleswitch-slider {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #E2E8F0 !important; // Gris claro en light mode
+        border: 1px solid #CBD5E1 !important;
+        border-radius: 9999px !important;
+        transition: all 0.2s ease-in-out;
+        
+        // El tirador (círculo interior)
+        &::before {
+            content: "" !important;
+            position: absolute !important;
+            height: 18px !important;
+            width: 18px !important;
+            left: 2px !important;
+            bottom: 2px !important;
+            background-color: white !important;
+            border-radius: 50% !important;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+    }
+    
+    // Estado activo / checked
+    &.p-toggleswitch-checked {
+        .p-toggleswitch-slider {
+            background-color: #FF634A !important; // Color primario
+            border-color: #FF634A !important;
+            
+            &::before {
+                transform: translateX(20px) !important;
+            }
+        }
+    }
+}
+
 /* ------------------------------------------------------------- */
 /* FORZADO ABSOLUTO PARA EL DARK MODE Y UTILERIAS PRIMEFLEX      */
 /* ------------------------------------------------------------- */
@@ -172,15 +227,20 @@ html.app-dark {
         opacity: 0.5;
     }
 
-    // Corregir fondo de ToggleSwitch y otros componentes comunes
+    // Sobrescritura para Dark Mode
     .p-toggleswitch {
         .p-toggleswitch-slider {
-            background: $opaline-dark-border !important;
-            border-color: $opaline-dark-border !important;
+            background-color: #333333 !important;
+            border-color: #444444 !important;
+            &::before {
+                background-color: #F5F5F5 !important;
+            }
         }
-        &.p-toggleswitch-checked .p-toggleswitch-slider {
-            background: $opaline-primary !important;
-            border-color: $opaline-primary !important;
+        &.p-toggleswitch-checked {
+            .p-toggleswitch-slider {
+                background-color: #FF634A !important;
+                border-color: #FF634A !important;
+            }
         }
     }
 
