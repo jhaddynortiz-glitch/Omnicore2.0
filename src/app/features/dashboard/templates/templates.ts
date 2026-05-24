@@ -547,7 +547,11 @@ export class Templates implements OnInit {
   saveTemplate() {
     if (this.templateForm.invalid) return;
 
-    const data = this.templateForm.value;
+    const data = { ...this.templateForm.value };
+    if (!this.isEditing) {
+      delete data.id;
+    }
+
     const request = this.isEditing && data.id
       ? this.templatesService.update(data.id, data)
       : this.templatesService.create(data);
