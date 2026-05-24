@@ -157,6 +157,12 @@ html.app-dark {
     .surface-border {
         border-color: $opaline-dark-border !important;
     }
+    .surface-50 {
+        background-color: rgba(255, 255, 255, 0.03) !important;
+    }
+    .surface-100 {
+        background-color: rgba(255, 255, 255, 0.06) !important;
+    }
 
     // Sobrescritura Textos PrimeFlex (que suelen ignorar variables globales)
     .text-900, .text-800 {
@@ -165,6 +171,15 @@ html.app-dark {
 
     .text-700, .text-600 {
         color: $opaline-dark-text-secondary !important;
+    }
+
+    .text-secondary {
+        color: $opaline-dark-text-secondary !important;
+    }
+
+    .text-500, .text-400 {
+        color: $opaline-dark-text-secondary !important;
+        opacity: 0.8 !important;
     }
 
     .text-primary {

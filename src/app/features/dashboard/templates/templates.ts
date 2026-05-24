@@ -77,7 +77,7 @@ import { TemplatesService, Template } from '../../../core/services/templates.ser
       flex-direction: column;
       justify-content: flex-end;
     }
-    html.app-dark .whatsapp-body {
+    :host-context(html.app-dark) .whatsapp-body {
       background-color: #0b141a; /* Dark Mode WA BG */
       background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
       background-blend-mode: multiply;
@@ -95,7 +95,7 @@ import { TemplatesService, Template } from '../../../core/services/templates.ser
       white-space: pre-wrap;
       position: relative;
     }
-    html.app-dark .whatsapp-bubble {
+    :host-context(html.app-dark) .whatsapp-bubble {
       background-color: #005c4b; /* Dark Mode checked bubble */
       color: #e9edef;
     }
@@ -112,7 +112,7 @@ import { TemplatesService, Template } from '../../../core/services/templates.ser
       white-space: pre-wrap;
       position: relative;
     }
-    html.app-dark .whatsapp-bubble-incoming {
+    :host-context(html.app-dark) .whatsapp-bubble-incoming {
       background-color: #202c33; /* Dark Mode incoming bubble */
       color: #e9edef;
     }
@@ -123,13 +123,13 @@ import { TemplatesService, Template } from '../../../core/services/templates.ser
       margin-top: 0.25rem;
       display: block;
     }
-    html.app-dark .whatsapp-time {
+    :host-context(html.app-dark) .whatsapp-time {
       color: #8696a0;
     }
     .variable-tag {
       cursor: pointer;
-      background-color: var(--primary-color);
-      color: white;
+      background-color: #FF634A; /* Opaline primary color */
+      color: white !important;
       font-size: 0.8rem;
       padding: 0.25rem 0.6rem;
       border-radius: 4px;

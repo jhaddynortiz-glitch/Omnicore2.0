@@ -57,7 +57,7 @@ import { OrdersService, Order } from '../../../core/services/orders.service';
       border-radius: 4px;
       overflow: hidden;
     }
-    html.app-dark .funnel-bar-container {
+    :host-context(html.app-dark) .funnel-bar-container {
       background: #37474F;
     }
     .funnel-bar-fill {
@@ -73,7 +73,7 @@ import { OrdersService, Order } from '../../../core/services/orders.service';
       border-radius: 8px;
       padding: 1rem;
     }
-    html.app-dark .expanded-details-card {
+    :host-context(html.app-dark) .expanded-details-card {
       background: rgba(255, 255, 255, 0.02);
     }
   `]
