@@ -64,22 +64,17 @@ export class Prompts implements OnInit {
 
   templateVariables = signal<{ label: string; syntax: string }[]>([]);
 
-  insertVariable(syntax: string) {
-    const textarea = document.getElementById('content') as HTMLTextAreaElement;
-    if (!textarea) return;
-
-    const startPos = textarea.selectionStart;
-    const endPos = textarea.selectionEnd;
-    const text = this.promptForm.get('content')?.value || '';
-    
-    const newText = text.substring(0, startPos) + syntax + text.substring(endPos, text.length);
-    this.promptForm.patchValue({ content: newText });
-
-    // Focus back and set cursor position
-    setTimeout(() => {
-      textarea.focus();
-      textarea.setSelectionRange(startPos + syntax.length, startPos + syntax.length);
-    }, 50);
+  copyToClipboard(syntax: string) {
+    navigator.clipboard.writeText(syntax).then(() => {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Copiado',
+        detail: `Copiado al portapapeles: ${syntax}`,
+        life: 1500
+      });
+    }).catch(err => {
+      console.error('Error al copiar al portapapeles:', err);
+    });
   }
 
   ngOnInit() {
