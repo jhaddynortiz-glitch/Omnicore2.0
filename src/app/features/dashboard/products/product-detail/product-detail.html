@@ -1,0 +1,428 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="product-detail-container p-4">
+    <!-- Header Section -->
+    <div class="header-section flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+        <div class="flex align-items-center gap-3">
+            <button pButton icon="pi pi-arrow-left" class="p-button-rounded p-button-text p-button-plain shadow-1 surface-card" (click)="goBack()"></button>
+            <div>
+                <h1 class="title m-0">
+                    {{ productId() ? 'Editar Producto' : 'Nuevo Producto' }}
+                </h1>
+                <p class="subtitle m-0">
+                    {{ productId() ? 'Modifica los detalles, disparadores y diseño del card de tu producto.' : 'Crea un nuevo producto en tu catálogo con disparadores de IA y diseño de card.' }}
+                </p>
+            </div>
+        </div>
+        <div class="flex gap-2">
+            <button pButton label="Cancelar" class="p-button-rounded p-button-outlined p-button-plain px-4" (click)="goBack()"></button>
+            <button pButton icon="pi pi-check" label="Guardar Cambios" class="p-button-rounded gradient-btn px-4 shadow-2" (click)="saveProduct()" [loading]="saving()"></button>
+        </div>
+    </div>
+
+    @if (loading()) {
+        <div class="flex justify-content-center align-items-center py-8">
+            <i class="pi pi-spin pi-spinner text-5xl text-primary"></i>
+        </div>
+    } @else {
+        <div [formGroup]="productForm" class="content-container">
+            <p-tabs [value]="activeTab().toString()" (valueChange)="$event !== null && $event !== undefined && activeTab.set(+$event)">
+                <p-tablist>
+                    <p-tab value="0">
+                        <i class="pi pi-shopping-bag mr-2"></i>
+                        <span>1. Nuevo o editar</span>
+                    </p-tab>
+                    <p-tab value="1">
+                        <i class="pi pi-bolt mr-2"></i>
+                        <span>2. Disparadores</span>
+                    </p-tab>
+                    <p-tab value="2">
+                        <i class="pi pi-image mr-2"></i>
+                        <span>3. Card</span>
+                    </p-tab>
+                </p-tablist>
+
+                <p-tabpanels class="pt-4">
+                    <!-- TAPE 1: NUEVO O EDITAR -->
+                    <p-tabpanel value="0">
+                        <div class="grid">
+                            <!-- Datos del Formulario -->
+                            <div class="col-12 lg:col-8">
+                                <div class="surface-card p-4 shadow-2 border-round-xl border-1 surface-border flex flex-column gap-4">
+                                    <h3 class="section-title m-0"><i class="pi pi-info-circle mr-2 text-primary"></i>Información Básica</h3>
+                                    
+                                    <div class="p-fluid grid">
+                                        <div class="col-12 field mb-3">
+                                            <label class="font-bold mb-2 block">Nombre del Producto*</label>
+                                            <input pInputText formControlName="name" placeholder="Ej: Hamburguesa de la Casa" class="p-inputtext-lg border-round-lg" />
+                                        </div>
+
+                                        <div class="col-12 md:col-6 field mb-3">
+                                            <label class="font-bold mb-2 block">Categoría</label>
+                                            <p-select [options]="categories()" formControlName="categoryId" optionLabel="name" optionValue="id" placeholder="Seleccionar categoría..." styleClass="border-round-lg"></p-select>
+                                        </div>
+
+                                        <div class="col-12 md:col-6 field mb-3">
+                                            <label class="font-bold mb-2 block">Subcategoría*</label>
+                                            <p-select [options]="filteredSubcategories()" formControlName="subcategoryId" optionLabel="name" optionValue="id" 
+                                                placeholder="Seleccionar subcategoría..." [disabled]="!productForm.get('categoryId')?.value" styleClass="border-round-lg"></p-select>
+                                        </div>
+
+                                        <div class="col-12 field mb-3">
+                                            <label class="font-bold mb-2 block">Descripción Completa</label>
+                                            <textarea pTextarea formControlName="description" rows="4" placeholder="Describe los ingredientes, dimensiones o características..." class="border-round-lg"></textarea>
+                                        </div>
+
+                                        <div class="col-12 md:col-6 field mb-3">
+                                            <label class="font-bold mb-2 block">Precio*</label>
+                                            <p-inputNumber formControlName="price" mode="decimal" [minFractionDigits]="2" placeholder="0.00" styleClass="border-round-lg"></p-inputNumber>
+                                        </div>
+
+                                        <div class="col-12 md:col-6 field mb-3">
+                                            <label class="font-bold mb-2 block">Stock*</label>
+                                            <p-inputNumber formControlName="stock" [showButtons]="true" placeholder="0" styleClass="border-round-lg"></p-inputNumber>
+                                        </div>
+                                    </div>
+
+                                    <p-divider></p-divider>
+                                    
+                                    <h3 class="section-title m-0"><i class="pi pi-truck mr-2 text-primary"></i>Métodos de Entrega Disponibles</h3>
+                                    <div class="grid pt-2">
+                                        <div class="col-12 md:col-4">
+                                            <div class="delivery-switch-card flex align-items-center justify-content-between p-3 border-1 surface-border border-round-xl">
+                                                <div class="flex align-items-center gap-2">
+                                                    <i class="pi pi-car text-primary text-xl"></i>
+                                                    <div>
+                                                        <span class="font-bold block text-sm">Delivery</span>
+                                                        <small class="text-500">Envío a domicilio</small>
+                                                    </div>
+                                                </div>
+                                                <p-toggleswitch formControlName="isDeliveryEnabled"></p-toggleswitch>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 md:col-4">
+                                            <div class="delivery-switch-card flex align-items-center justify-content-between p-3 border-1 surface-border border-round-xl">
+                                                <div class="flex align-items-center gap-2">
+                                                    <i class="pi pi-building text-primary text-xl"></i>
+                                                    <div>
+                                                        <span class="font-bold block text-sm">Retiro Local</span>
+                                                        <small class="text-500">En tienda física</small>
+                                                    </div>
+                                                </div>
+                                                <p-toggleswitch formControlName="isLocalEnabled"></p-toggleswitch>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 md:col-4">
+                                            <div class="delivery-switch-card flex align-items-center justify-content-between p-3 border-1 surface-border border-round-xl">
+                                                <div class="flex align-items-center gap-2">
+                                                    <i class="pi pi-map-marker text-primary text-xl"></i>
+                                                    <div>
+                                                        <span class="font-bold block text-sm">Encuentros</span>
+                                                        <small class="text-500">Puntos coordinados</small>
+                                                    </div>
+                                                </div>
+                                                <p-toggleswitch formControlName="isMeetingEnabled"></p-toggleswitch>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Panel de Imagen Lateral -->
+                            <div class="col-12 lg:col-4">
+                                <div class="surface-card p-4 shadow-2 border-round-xl border-1 surface-border flex flex-column align-items-center gap-4 text-center">
+                                    <h3 class="section-title m-0 w-full text-left"><i class="pi pi-image mr-2 text-primary"></i>Imagen Principal</h3>
+                                    
+                                    <div class="relative w-14rem h-14rem border-round-xl border-1 surface-border surface-card flex align-items-center justify-content-center overflow-hidden shadow-2 transition-transform hover:scale-102">
+                                        @if (productForm.get('imageUrl')?.value) {
+                                            <img [src]="productForm.get('imageUrl')?.value" class="w-full h-full" style="object-fit: cover;" />
+                                            <button pButton icon="pi pi-times" 
+                                                class="p-button-rounded p-button-danger p-button-sm absolute shadow-2" 
+                                                style="top: 0.5rem; right: 0.5rem; width: 2.2rem; height: 2.2rem;"
+                                                (click)="removeImage('main')"
+                                                pTooltip="Eliminar imagen"></button>
+                                        } @else if (isUploadingImage()) {
+                                            <div class="flex flex-column align-items-center gap-2">
+                                                <i class="pi pi-spin pi-spinner text-4xl text-primary"></i>
+                                                <span class="text-sm font-semibold text-500">Subiendo...</span>
+                                            </div>
+                                        } @else {
+                                            <div class="text-center p-4 cursor-pointer hover:surface-hover w-full h-full flex flex-column align-items-center justify-content-center transition-colors"
+                                                 (click)="fileInput.click()">
+                                                <i class="pi pi-camera text-5xl text-400 mb-3"></i>
+                                                <span class="text-sm font-bold text-600 block">Subir foto de catálogo</span>
+                                                <small class="text-500 text-xs block mt-1">Formatos: JPG, PNG (1:1)</small>
+                                            </div>
+                                        }
+                                    </div>
+                                    <input type="file" #fileInput (change)="onImageSelected($event, 'main')" accept="image/*" style="display: none;" />
+                                    <small class="text-500 leading-normal">Esta imagen se mostrará en los catálogos y por defecto será usada en el card si no especificas una imagen exclusiva.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </p-tabpanel>
+
+                    <!-- TAPE 2: DISPARADORES -->
+                    <p-tabpanel value="1">
+                        <div class="grid">
+                            <!-- Palabras clave (Disparadores de IA) -->
+                            <div class="col-12 md:col-6">
+                                <div class="surface-card p-4 shadow-2 border-round-xl border-1 surface-border flex flex-column gap-4 min-h-25rem">
+                                    <div>
+                                        <h3 class="section-title m-0 mb-1"><i class="pi pi-bolt mr-2 text-primary"></i>Palabras Clave e Intenciones</h3>
+                                        <p class="text-500 text-sm m-0">Define frases o palabras clave que harán que la IA responda directamente mostrando este producto al cliente en WhatsApp.</p>
+                                    </div>
+
+                                    <!-- Input para añadir palabras clave -->
+                                    <div class="flex gap-2">
+                                        <div class="flex-grow-1">
+                                            <span class="p-input-icon-left w-full">
+                                                <i class="pi pi-plus text-primary"></i>
+                                                <input pInputText type="text" [(ngModel)]="newKeyword" 
+                                                    [ngModelOptions]="{standalone: true}"
+                                                    (keyup.enter)="addKeyword()"
+                                                    placeholder="Ej: hamburguesa, chester, carne (Separado por comas)" class="w-full border-round-lg" />
+                                            </span>
+                                        </div>
+                                        <button pButton icon="pi pi-plus" label="Añadir" class="gradient-btn px-4 shadow-1 border-round-lg" (click)="addKeyword()"></button>
+                                    </div>
+
+                                    <!-- Listado de Chips -->
+                                    <div class="flex flex-column gap-2 flex-grow-1">
+                                        <div class="flex justify-content-between align-items-center">
+                                            <span class="text-sm font-bold text-700">Palabras vinculadas ({{ keywordsList().length }})</span>
+                                            @if (keywordsList().length > 0) {
+                                                <button pButton label="Limpiar todo" class="p-button-text p-button-danger p-button-sm py-1 px-2" (click)="clearAllKeywords()"></button>
+                                            }
+                                        </div>
+
+                                        @if (keywordsList().length > 0) {
+                                            <div class="keywords-chips-container p-3 border-1 surface-border border-round-xl surface-50 flex flex-wrap gap-2 align-content-start overflow-y-auto" style="max-height: 12rem;">
+                                                @for (word of keywordsList(); track word) {
+                                                    <div class="keyword-chip flex align-items-center gap-2 px-3 py-2 border-round-full shadow-1 text-sm font-semibold transition-colors">
+                                                        <span>{{ word }}</span>
+                                                        <i class="pi pi-times-circle cursor-pointer text-400 hover:text-danger text-base transition-colors" (click)="removeKeyword(word)"></i>
+                                                    </div>
+                                                }
+                                            </div>
+                                        } @else {
+                                            <div class="flex-grow-1 flex flex-column align-items-center justify-content-center border-dashed border-2 surface-border border-round-xl p-4 text-center">
+                                                <i class="pi pi-hashtag text-400 text-3xl mb-2"></i>
+                                                <p class="m-0 text-500 text-sm font-medium">No hay palabras clave registradas.</p>
+                                                <small class="text-400 block mt-1">Escribe una palabra o frase arriba y presiona "Añadir".</small>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Anuncios Vinculados -->
+                            <div class="col-12 md:col-6">
+                                <div class="surface-card p-4 shadow-2 border-round-xl border-1 surface-border flex flex-column gap-4 min-h-25rem" formArrayName="ads">
+                                    <div class="flex justify-content-between align-items-center">
+                                        <div>
+                                            <h3 class="section-title m-0 mb-1"><i class="pi pi-megaphone mr-2 text-primary"></i>Anuncios Vinculados (Opcional)</h3>
+                                            <p class="text-500 text-sm m-0">Vincula códigos de tus campañas activas en redes sociales para rastrear conversiones.</p>
+                                        </div>
+                                        <button pButton icon="pi pi-plus" label="Añadir" class="p-button-sm p-button-outlined" (click)="addAd()"></button>
+                                    </div>
+
+                                    <div class="flex-grow-1">
+                                        @if (productAds.controls.length > 0) {
+                                            <div class="border-1 surface-border border-round-xl overflow-hidden shadow-1">
+                                                <p-table [value]="productAds.controls" styleClass="p-datatable-sm">
+                                                    <ng-template pTemplate="header">
+                                                        <tr>
+                                                            <th class="bg-surface-card border-bottom-1 surface-border">Plataforma</th>
+                                                            <th class="bg-surface-card border-bottom-1 surface-border">ID de Anuncio</th>
+                                                            <th class="bg-surface-card border-bottom-1 surface-border text-center" style="width: 3.5rem"></th>
+                                                        </tr>
+                                                    </ng-template>
+                                                    <ng-template pTemplate="body" let-adCtrl let-i="rowIndex">
+                                                        <tr [formGroupName]="i" class="hover:surface-hover transition-colors">
+                                                            <td class="surface-border">
+                                                                <p-select formControlName="platform" 
+                                                                          [options]="[{label: 'Meta (FB/IG)', value: 'meta'}, {label: 'TikTok', value: 'tiktok'}, {label: 'Google', value: 'google'}, {label: 'Otro', value: 'other'}]" 
+                                                                          optionLabel="label" optionValue="value" 
+                                                                          appendTo="body"
+                                                                          styleClass="w-full border-none shadow-none bg-transparent"></p-select>
+                                                            </td>
+                                                            <td class="surface-border">
+                                                                <input pInputText formControlName="adId" class="w-full border-none shadow-none bg-transparent p-2 font-mono" placeholder="Ej: 84729104729" />
+                                                            </td>
+                                                            <td class="text-center surface-border">
+                                                                <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger p-button-sm" (click)="removeAd(i)"></button>
+                                                            </td>
+                                                        </tr>
+                                                    </ng-template>
+                                                </p-table>
+                                            </div>
+                                        } @else {
+                                            <div class="h-full flex flex-column align-items-center justify-content-center border-dashed border-2 surface-border border-round-xl p-4 text-center">
+                                                <i class="pi pi-chart-line text-400 text-3xl mb-2"></i>
+                                                <p class="m-0 text-500 text-sm font-medium">No hay anuncios vinculados a este producto.</p>
+                                                <small class="text-400 block mt-1">Ideal para automatizaciones basadas en clics de anuncios.</small>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </p-tabpanel>
+
+                    <!-- TAPE 3: CARD -->
+                    <p-tabpanel value="2">
+                        <div class="grid">
+                            <!-- Editor de Estilos / Textarea -->
+                            <div class="col-12 lg:col-7 flex flex-column gap-4">
+                                <div class="surface-card p-4 shadow-2 border-round-xl border-1 surface-border flex flex-column gap-3">
+                                    <h3 class="section-title m-0"><i class="pi pi-file-edit mr-2 text-primary"></i>Plantilla del Card de WhatsApp</h3>
+                                    <p class="text-500 text-sm m-0">Personaliza la presentación comercial del producto. Cuando la IA muestre este producto en WhatsApp, utilizará este formato.</p>
+                                    
+                                    <!-- Selector rápido de variables -->
+                                    <div class="variables-bar flex flex-column gap-2 p-3 border-1 surface-border border-round-xl surface-50">
+                                        <span class="text-xs font-bold text-700 uppercase"><i class="pi pi-paperclip mr-1"></i>Variables Dinámicas de Producto (Haz clic para insertar)</span>
+                                        <div class="flex flex-wrap gap-2">
+                                            <button type="button" pButton [label]="'{{nombre}}'" class="p-button-outlined p-button-sm border-round-lg py-1 px-2 text-xs font-mono" (click)="insertVariable('{{nombre}}')" pTooltip="Nombre del producto"></button>
+                                            <button type="button" pButton [label]="'{{descripcion}}'" class="p-button-outlined p-button-sm border-round-lg py-1 px-2 text-xs font-mono" (click)="insertVariable('{{descripcion}}')" pTooltip="Descripción del producto"></button>
+                                            <button type="button" pButton [label]="'{{precio}}'" class="p-button-outlined p-button-sm border-round-lg py-1 px-2 text-xs font-mono" (click)="insertVariable('{{precio}}')" pTooltip="Precio del producto"></button>
+                                            <button type="button" pButton [label]="'{{moneda}}'" class="p-button-outlined p-button-sm border-round-lg py-1 px-2 text-xs font-mono" (click)="insertVariable('{{moneda}}')" pTooltip="Moneda por defecto"></button>
+                                            <button type="button" pButton [label]="'{{stock}}'" class="p-button-outlined p-button-sm border-round-lg py-1 px-2 text-xs font-mono" (click)="insertVariable('{{stock}}')" pTooltip="Cantidad en inventario"></button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Textarea de Card -->
+                                    <div class="field m-0">
+                                        <textarea id="cardDescriptionTextarea" pTextarea formControlName="cardDescription" rows="10" 
+                                            class="w-full font-mono text-base p-3 border-round-xl border-1 surface-border focus:border-primary shadow-inner"
+                                            placeholder="Diseña tu card..."></textarea>
+                                    </div>
+                                    <small class="text-500 leading-normal">Tip: Puedes usar formato estándar de WhatsApp: negritas con `*texto*`, cursivas con `_texto_`, y tachado con `~texto~`.</small>
+                                </div>
+
+                                <div class="surface-card p-4 shadow-2 border-round-xl border-1 surface-border flex flex-column gap-3">
+                                    <h3 class="section-title m-0"><i class="pi pi-image mr-2 text-primary"></i>Imagen Exclusiva para el Card (Opcional)</h3>
+                                    <p class="text-500 text-sm m-0">Puedes elegir una imagen específica para mostrar en este card. Si la dejas vacía, se utilizará la imagen principal del producto de manera automática.</p>
+                                    
+                                    <div class="flex flex-wrap align-items-center gap-4">
+                                        <div class="relative w-9rem h-9rem border-round-xl border-1 surface-border surface-card flex align-items-center justify-content-center overflow-hidden shadow-2 transition-transform hover:scale-102">
+                                            @if (productForm.get('cardImageUrl')?.value) {
+                                                <img [src]="productForm.get('cardImageUrl')?.value" class="w-full h-full" style="object-fit: cover;" />
+                                                <button pButton icon="pi pi-times" 
+                                                    class="p-button-rounded p-button-danger p-button-sm absolute shadow-2" 
+                                                    style="top: 0.5rem; right: 0.5rem; width: 2rem; height: 2rem;"
+                                                    (click)="removeImage('card')"
+                                                    pTooltip="Eliminar imagen"></button>
+                                            } @else if (isUploadingCardImage()) {
+                                                <div class="flex flex-column align-items-center gap-1">
+                                                    <i class="pi pi-spin pi-spinner text-3xl text-primary"></i>
+                                                    <span class="text-xs font-semibold text-500">Cargando...</span>
+                                                </div>
+                                            } @else {
+                                                <div class="text-center p-3 cursor-pointer hover:surface-hover w-full h-full flex flex-column align-items-center justify-content-center transition-colors"
+                                                     (click)="cardFileInput.click()">
+                                                    <i class="pi pi-camera text-3xl text-400 mb-2"></i>
+                                                    <span class="text-xs font-bold text-600 block">Subir foto exclusiva</span>
+                                                </div>
+                                            }
+                                        </div>
+                                        <input type="file" #cardFileInput (change)="onImageSelected($event, 'card')" accept="image/*" style="display: none;" />
+                                        
+                                        <div class="flex-grow-1 max-w-20rem">
+                                            @if (productForm.get('cardImageUrl')?.value) {
+                                                <div class="p-2 border-round-lg border-1 border-primary-50 bg-primary-50 flex align-items-center gap-2 text-primary font-semibold text-sm">
+                                                    <i class="pi pi-check-circle"></i>
+                                                    <span>Imagen exclusiva configurada</span>
+                                                </div>
+                                            } @else {
+                                                <div class="p-2 border-round-lg border-1 border-300 bg-50 flex align-items-center gap-2 text-500 text-sm">
+                                                    <i class="pi pi-info-circle"></i>
+                                                    <span>Heredando imagen principal</span>
+                                                </div>
+                                            }
+                                            <small class="text-500 block mt-2 leading-normal">Útil si el card requiere un banner publicitario estilizado, mientras que la lista interna mantiene la foto simple del producto.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Previsualizador de Card de WhatsApp -->
+                            <div class="col-12 lg:col-5">
+                                <div class="surface-card p-4 shadow-2 border-round-xl border-1 surface-border flex flex-column gap-3 sticky-preview">
+                                    <h3 class="section-title m-0"><i class="pi pi-eye mr-2 text-primary"></i>Vista Previa en Tiempo Real</h3>
+                                    <p class="text-500 text-sm m-0">Visualiza exactamente cómo se enviará y mostrará este card dinámico en el WhatsApp del cliente final.</p>
+
+                                    <!-- WhatsApp Simulator Container -->
+                                    <div class="whatsapp-chat-simulator shadow-4 border-round-2xl overflow-hidden border-1 surface-border">
+                                        <!-- Header del simulador -->
+                                        <div class="whatsapp-sim-header flex align-items-center gap-2 p-3 text-white">
+                                            <i class="pi pi-arrow-left text-sm cursor-pointer"></i>
+                                            <div class="whatsapp-sim-avatar flex align-items-center justify-content-center font-bold text-sm">
+                                                🤖
+                                            </div>
+                                            <div class="flex-grow-1 flex flex-column">
+                                                <span class="font-bold text-sm leading-normal">Chatbot Inteligente</span>
+                                                <span class="text-xs text-green-300 font-semibold leading-normal">en línea</span>
+                                            </div>
+                                            <div class="flex gap-3 text-sm cursor-pointer opacity-90">
+                                                <i class="pi pi-video"></i>
+                                                <i class="pi pi-phone"></i>
+                                                <i class="pi pi-ellipsis-v"></i>
+                                            </div>
+                                        </div>
+
+                                        <!-- Panel de Chat con Fondo de WhatsApp -->
+                                        <div class="whatsapp-sim-chat-area p-3 flex flex-column justify-content-end gap-3">
+                                            
+                                            <!-- Burbuja de Mensaje del Usuario (Preguntando) -->
+                                            <div class="whatsapp-bubble user-bubble align-self-end p-3 shadow-1 max-w-85 text-sm leading-normal">
+                                                ¿Tienen información sobre este producto? 🤔
+                                                <span class="bubble-meta flex align-items-center gap-1 mt-1 opacity-70">
+                                                    <span>18:45</span>
+                                                </span>
+                                            </div>
+
+                                            <!-- Burbuja de Mensaje del Bot (Respuesta del Card) -->
+                                            <div class="whatsapp-bubble bot-bubble align-self-start shadow-1 max-w-85 flex flex-column overflow-hidden border-round-xl">
+                                                <!-- Imagen del Card -->
+                                                @if (previewImageUrl()) {
+                                                    <div class="whatsapp-bubble-image w-full relative overflow-hidden" style="max-height: 18rem; aspect-ratio: 16/10;">
+                                                        <img [src]="previewImageUrl()" class="w-full h-full" style="object-fit: cover;" />
+                                                    </div>
+                                                } @else {
+                                                    <div class="whatsapp-bubble-image-placeholder w-full flex flex-column align-items-center justify-content-center bg-200 text-400 p-5" style="aspect-ratio: 16/10;">
+                                                        <i class="pi pi-image text-5xl mb-2"></i>
+                                                        <span class="text-sm font-semibold">Sin imagen</span>
+                                                    </div>
+                                                }
+
+                                                <!-- Cuerpo del Card (HTML formateado) -->
+                                                <div class="whatsapp-bubble-content p-3 text-sm leading-normal">
+                                                    <div [innerHTML]="whatsappPreviewHtml()" class="formatted-whatsapp-text"></div>
+                                                    
+                                                    <!-- Meta Datos de Burbuja de WhatsApp -->
+                                                    <span class="bubble-meta flex justify-content-end align-items-center gap-1 mt-2 opacity-60">
+                                                        <span>18:45</span>
+                                                        <i class="pi pi-check-double text-blue-500"></i>
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </p-tabpanel>
+                </p-tabpanels>
+            </p-tabs>
+
+            <!-- Sticky Save Bar at Bottom -->
+            <div class="surface-card p-3 border-top-1 surface-border border-round-bottom-xl shadow-2 flex justify-content-end gap-2 mt-4">
+                <button pButton label="Cancelar" class="p-button-text p-button-plain px-4" (click)="goBack()"></button>
+                <button pButton icon="pi pi-check" label="Guardar Producto" class="gradient-btn px-4 shadow-2" (click)="saveProduct()" [loading]="saving()"></button>
+            </div>
+        </div>
+    }
+</div>

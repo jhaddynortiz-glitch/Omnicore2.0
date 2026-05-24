@@ -1,4 +1,5 @@
 import { Component, inject, signal, OnInit, computed } from '@angular/core';
+import { Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators, FormArray } from '@angular/forms';
@@ -54,6 +55,7 @@ export class Products implements OnInit {
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
   private chatService = inject(ChatService);
+  private router = inject(Router);
 
   // --- Signals de Datos ---
   products = signal<Product[]>([]);
@@ -207,38 +209,11 @@ export class Products implements OnInit {
 
   // --- Métodos de Productos ---
   openNewProduct() {
-    this.isEditing.set(false);
-    this.productForm.reset({ 
-      price: 0, 
-      stock: 0, 
-      currency: 'Bs', 
-      isActive: true,
-      isDeliveryEnabled: true,
-      isLocalEnabled: true,
-      isMeetingEnabled: true
-    });
-    this.productAds.clear();
-    this.showProductDialog.set(true);
+    this.router.navigate(['/dashboard/products/new']);
   }
 
   editProduct(product: Product) {
-    this.isEditing.set(true);
-    
-    this.productAds.clear();
-    if (product.ads && product.ads.length > 0) {
-      product.ads.forEach(ad => {
-        this.productAds.push(this.fb.group({
-          adId: [ad.adId, Validators.required],
-          platform: [ad.platform, Validators.required]
-        }));
-      });
-    }
-
-    this.productForm.patchValue({
-        ...product,
-        categoryId: product.Subcategory?.categoryId || ''
-    });
-    this.showProductDialog.set(true);
+    this.router.navigate(['/dashboard/products', product.id]);
   }
 
   saveProduct() {

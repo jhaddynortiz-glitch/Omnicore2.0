@@ -26,6 +26,9 @@ export interface Product {
   isDeliveryEnabled?: boolean;
   isLocalEnabled?: boolean;
   isMeetingEnabled?: boolean;
+  keywords?: string[];
+  cardDescription?: string;
+  cardImageUrl?: string;
 }
 
 @Injectable({
@@ -42,6 +45,10 @@ export class ProductsService {
     if (filters?.search) params = params.set('search', filters.search);
     
     return this.http.get<Product[]>(this.apiUrl, { params });
+  }
+
+  findOne(id: string): Observable<Product> {
+    return this.http.get<Product>(`${this.apiUrl}/${id}`);
   }
 
   create(product: Product): Observable<Product> {

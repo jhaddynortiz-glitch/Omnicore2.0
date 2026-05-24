@@ -44,6 +44,14 @@ export const routes: Routes = [
           loadComponent: () => import('./features/dashboard/products/products').then(m => m.Products)
         },
         {
+          path: 'products/new',
+          loadComponent: () => import('./features/dashboard/products/product-detail/product-detail').then(m => m.ProductDetail)
+        },
+        {
+          path: 'products/:id',
+          loadComponent: () => import('./features/dashboard/products/product-detail/product-detail').then(m => m.ProductDetail)
+        },
+        {
           path: 'prompts',
           loadComponent: () => import('./features/dashboard/prompts/prompts').then(m => m.Prompts)
         },

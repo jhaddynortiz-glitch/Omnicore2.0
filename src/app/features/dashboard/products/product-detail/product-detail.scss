@@ -1,0 +1,240 @@
+/* --- Estilos Generales de Contenedores --- */
+.product-detail-container {
+  max-width: 1300px;
+  margin: 0 auto;
+
+  .title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--text-color, #111b21);
+    letter-spacing: -0.025em;
+  }
+
+  .subtitle {
+    color: var(--text-color-secondary, #667085);
+    font-size: 0.875rem;
+  }
+
+  .section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-color);
+    letter-spacing: -0.01em;
+  }
+}
+
+/* --- Botones Especiales --- */
+.gradient-btn {
+  background: linear-gradient(135deg, var(--primary-color, #3b82f6) 0%, #1d4ed8 100%) !important;
+  border: none !important;
+  color: #ffffff !important;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+/* --- Switches de Delivery --- */
+.delivery-switch-card {
+  background-color: var(--surface-card);
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: var(--primary-color) !important;
+    background-color: var(--surface-hover);
+  }
+}
+
+/* --- Chips de Palabras Clave (Vanilla CSS Premium) --- */
+.keywords-chips-container {
+  min-height: 8rem;
+  background-color: var(--surface-ground, #f9fafb);
+}
+
+.keyword-chip {
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e40af;
+  
+  // Soporte para Dark Mode en el frontend mediante .app-dark o html.app-dark
+  :host-context(.app-dark) & {
+    background-color: rgba(30, 58, 138, 0.2);
+    border-color: rgba(30, 58, 138, 0.5);
+    color: #60a5fa;
+  }
+
+  i:hover {
+    color: #ef4444 !important;
+  }
+}
+
+/* --- Editor de Variables --- */
+.variables-bar {
+  background-color: var(--surface-ground);
+  
+  button {
+    font-family: var(--font-family-monospace, monospace);
+    background-color: var(--surface-card) !important;
+    color: var(--primary-color) !important;
+    border-color: var(--primary-color-200, #bfdbfe) !important;
+    transition: all 0.15s ease;
+
+    &:hover {
+      background-color: var(--primary-color-50, #eff6ff) !important;
+      border-color: var(--primary-color) !important;
+    }
+  }
+}
+
+/* --- Simulador de WhatsApp Ultra Realista --- */
+.sticky-preview {
+  position: sticky;
+  top: 1.5rem;
+  z-index: 10;
+}
+
+.whatsapp-chat-simulator {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #efeae2;
+  
+  // Fondo adaptativo en Dark Mode
+  :host-context(.app-dark) & {
+    background-color: #0b141a;
+  }
+
+  .whatsapp-sim-header {
+    background-color: #008069;
+    
+    :host-context(.app-dark) & {
+      background-color: #202c33;
+    }
+
+    .whatsapp-sim-avatar {
+      width: 2.2rem;
+      height: 2.2rem;
+      background-color: rgba(255, 255, 255, 0.2);
+      border-round: 50%;
+      border-radius: 50%;
+    }
+  }
+
+  .whatsapp-sim-chat-area {
+    min-height: 480px;
+    background-image: radial-gradient(rgba(0, 0, 0, 0.08) 1px, transparent 0);
+    background-size: 24px 24px;
+    
+    // Fondo en modo oscuro
+    :host-context(.app-dark) & {
+      background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 0);
+    }
+  }
+
+  .whatsapp-bubble {
+    border-radius: 12px;
+    position: relative;
+    box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13);
+    word-break: break-word;
+
+    &.user-bubble {
+      background-color: #d9fdd3;
+      color: #111b21;
+      border-top-right-radius: 0;
+
+      :host-context(.app-dark) & {
+        background-color: #005c4b;
+        color: #e9edef;
+      }
+    }
+
+    &.bot-bubble {
+      background-color: #ffffff;
+      color: #111b21;
+      border-top-left-radius: 0;
+
+      :host-context(.app-dark) & {
+        background-color: #202c33;
+        color: #e9edef;
+      }
+    }
+
+    .bubble-meta {
+      font-size: 0.68rem;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      color: #667781;
+      
+      :host-context(.app-dark) & {
+        color: #8696a0;
+      }
+    }
+  }
+
+  .whatsapp-bubble-image-placeholder {
+    background-color: #e2e8f0;
+    color: #94a3b8;
+    
+    :host-context(.app-dark) & {
+      background-color: #2a3942;
+      color: #667781;
+    }
+  }
+
+  // Estilo de formateo de texto de WhatsApp
+  .formatted-whatsapp-text {
+    font-size: 0.875rem;
+    line-height: 1.45;
+    
+    strong {
+      font-weight: 700;
+    }
+    
+    em {
+      font-style: italic;
+    }
+    
+    del {
+      text-decoration: line-through;
+    }
+  }
+}
+
+/* --- Clases de Utilidad y Animaciones --- */
+.scale-102:hover {
+  transform: scale(1.02);
+}
+
+.max-h-12rem {
+  max-height: 12rem;
+}
+
+.max-w-85 {
+  max-width: 85%;
+}
+
+.py-8 {
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+}
+
+.overflow-y-auto {
+  overflow-y: auto;
+}
+.align-content-start {
+  align-content: flex-start;
+}
+.min-h-25rem {
+  min-height: 25rem;
+}
+.shadow-inner {
+  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+}
