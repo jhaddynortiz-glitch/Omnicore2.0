@@ -75,26 +75,18 @@
         <div class="field mb-4">
             <label for="content" class="font-bold block mb-2">Contenido (Instrucciones del Sistema)</label>
             
-            <div class="flex align-items-center gap-2 border-round-lg border-1 surface-border bg-black-alpha-5 px-3 py-2 mb-3 shadow-1" style="overflow-x: auto; white-space: nowrap; height: 52px; align-items: center; display: flex;">
-                <span class="font-bold text-xs text-900 mr-2 flex align-items-center" style="flex-shrink: 0;"><i class="pi pi-copy mr-1 text-primary"></i> Copiar variable:</span>
-                
-                <!-- Variables del Sistema (Fijas) -->
-                @for (v of fixedVariables; track v.syntax) {
-                    <button pButton type="button" icon="pi pi-copy" [label]="v.syntax" 
-                            class="p-button-xs p-button-outlined p-button-secondary border-round-lg px-2 mr-1"
-                            style="height: 28px; font-size: 0.75rem; font-family: monospace; flex-shrink: 0; padding: 0.25rem 0.5rem;"
-                            [pTooltip]="v.label"
-                            (click)="copyToClipboard(v.syntax)"></button>
-                }
-                
-                <!-- Plantillas -->
-                @for (tpl of templateVariables(); track tpl.syntax) {
-                    <button pButton type="button" icon="pi pi-copy" [label]="tpl.syntax" 
-                            class="p-button-xs p-button-outlined border-round-lg px-2 mr-1"
-                            style="height: 28px; font-size: 0.75rem; font-family: monospace; flex-shrink: 0; padding: 0.25rem 0.5rem; border-color: #14b8a6; color: #14b8a6;"
-                            [pTooltip]="'Plantilla: ' + tpl.label"
-                            (click)="copyToClipboard(tpl.syntax)"></button>
-                }
+            <div class="flex align-items-center gap-2 mb-3">
+                <div class="p-inputgroup flex-grow-1" style="height: 38px;">
+                    <span class="p-inputgroup-addon bg-black-alpha-5 border-1 text-xs font-bold text-900 px-3" style="border-top-left-radius: 8px; border-bottom-left-radius: 8px;">
+                        <i class="pi pi-copy mr-1 text-primary"></i> Variables Disponibles
+                    </span>
+                    <input pInputText type="text" readonly [value]="allVariablesText" 
+                           class="border-1 text-sm text-600 bg-black-alpha-5 px-3"
+                           style="font-family: monospace; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;" />
+                    <button pButton type="button" icon="pi pi-clone" class="p-button-primary px-4" 
+                            style="border-top-right-radius: 8px; border-bottom-right-radius: 8px;"
+                            pTooltip="Copiar todas al portapapeles" (click)="copyAllVariables()"></button>
+                </div>
             </div>
 
             <textarea pTextarea id="content" formControlName="content" rows="10" 

@@ -64,16 +64,23 @@ export class Prompts implements OnInit {
 
   templateVariables = signal<{ label: string; syntax: string }[]>([]);
 
-  copyToClipboard(syntax: string) {
-    navigator.clipboard.writeText(syntax).then(() => {
+  get allVariablesText(): string {
+    const fixed = this.fixedVariables.map(v => v.syntax);
+    const templates = this.templateVariables().map(t => t.syntax);
+    return [...fixed, ...templates].join(', ');
+  }
+
+  copyAllVariables() {
+    const text = this.allVariablesText;
+    navigator.clipboard.writeText(text).then(() => {
       this.messageService.add({
         severity: 'success',
         summary: 'Copiado',
-        detail: `Copiado al portapapeles: ${syntax}`,
+        detail: 'Todas las variables se copiaron como un solo texto',
         life: 1500
       });
     }).catch(err => {
-      console.error('Error al copiar al portapapeles:', err);
+      console.error('Error al copiar todas las variables:', err);
     });
   }
 
