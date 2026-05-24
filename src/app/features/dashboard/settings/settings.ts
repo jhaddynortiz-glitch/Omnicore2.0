@@ -8,7 +8,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { ButtonModule } from 'primeng/button';
 import { DividerModule } from 'primeng/divider';
 import { PasswordModule } from 'primeng/password';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { DialogModule } from 'primeng/dialog';
 import { SelectModule } from 'primeng/select';
@@ -16,6 +16,7 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 import { TabsModule } from 'primeng/tabs';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 import { OrganizationsService } from '../../../core/services/organizations.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -56,9 +57,10 @@ L.Marker.prototype.options.icon = defaultIcon;
     ToggleSwitchModule,
     TableModule,
     TooltipModule,
-    TabsModule
+    TabsModule,
+    ConfirmDialogModule
   ],
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './settings.html',
   styles: [`
     .settings-container {
@@ -116,6 +118,7 @@ export class Settings implements OnInit {
   private chatService = inject(ChatService);
   private logisticsService = inject(LogisticsService);
   private messageService = inject(MessageService);
+  private confirmationService = inject(ConfirmationService);
   private fb = inject(FormBuilder);
   private cdr = inject(ChangeDetectorRef);
 
@@ -126,11 +129,14 @@ export class Settings implements OnInit {
     whatsappPhoneId: '',
     whatsappVerifyToken: '',
     openaiApiKey: '',
+    logoUrl: '',
     isDeliveryEnabled: false,
     isLocalEnabled: false,
     isMeetingEnabled: false
   });
 
+  originalOrgData: any = null;
+  isUploadingLogo = false;
   loading = signal(false);
   activeTab = '0';
 
@@ -259,6 +265,7 @@ export class Settings implements OnInit {
           ...this.orgData(),
           ...data
         });
+        this.originalOrgData = JSON.parse(JSON.stringify(this.orgData()));
         this.cdr.detectChanges();
       },
       error: () => {
@@ -272,11 +279,39 @@ export class Settings implements OnInit {
     const orgId = user?.activeOrganizationId;
     if (!orgId) return;
 
+    const current = this.orgData();
+    const orig = this.originalOrgData || {};
+
+    const sensitiveChanged = 
+      current.name !== orig.name ||
+      current.whatsappToken !== orig.whatsappToken ||
+      current.whatsappPhoneId !== orig.whatsappPhoneId ||
+      current.whatsappVerifyToken !== orig.whatsappVerifyToken ||
+      current.openaiApiKey !== orig.openaiApiKey;
+
+    if (sensitiveChanged) {
+      this.confirmationService.confirm({
+        message: 'Has modificado campos sensibles (Nombre Comercial, credenciales de WhatsApp o OpenAI API Key). ¿Estás seguro de guardar los cambios? Esto podría alterar el funcionamiento del bot y sus automatizaciones.',
+        header: 'Confirmación de Cambios Sensibles',
+        icon: 'pi pi-exclamation-triangle',
+        acceptButtonProps: { severity: 'danger', label: 'Sí, Guardar', class: 'p-button-danger border-round-lg' },
+        rejectButtonProps: { label: 'Cancelar', class: 'p-button-text' },
+        accept: () => {
+          this.executeSaveSettings(orgId);
+        }
+      });
+    } else {
+      this.executeSaveSettings(orgId);
+    }
+  }
+
+  private executeSaveSettings(orgId: string) {
     this.loading.set(true);
     this.orgService.update(orgId, this.orgData()).subscribe({
       next: (updated) => {
         this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Configuración general guardada' });
         this.orgData.set({ ...this.orgData(), ...updated });
+        this.originalOrgData = JSON.parse(JSON.stringify(this.orgData()));
         this.loading.set(false);
         this.cdr.detectChanges();
       },
@@ -589,6 +624,42 @@ export class Settings implements OnInit {
 
   removeStoreImage() {
     this.currentStoreForm.patchValue({ imageUrl: '' });
+  }
+
+  onLogoUpload(event: any) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'El archivo excede el límite de 2MB' });
+      return;
+    }
+
+    this.isUploadingLogo = true;
+    this.chatService.uploadFile(file).subscribe({
+      next: (res) => {
+        this.orgData.update(current => ({
+          ...current,
+          logoUrl: res.url
+        }));
+        this.isUploadingLogo = false;
+        this.messageService.add({ severity: 'success', summary: 'Logo Cargado', detail: 'El logo se subió correctamente. Recuerda guardar los cambios.' });
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.isUploadingLogo = false;
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo subir la imagen del logo' });
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  removeLogo() {
+    this.orgData.update(current => ({
+      ...current,
+      logoUrl: null
+    }));
+    this.messageService.add({ severity: 'info', summary: 'Logo Removido', detail: 'El logo fue quitado. Recuerda guardar los cambios.' });
   }
 
   // ==========================================

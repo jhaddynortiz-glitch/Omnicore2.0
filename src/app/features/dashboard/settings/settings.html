@@ -1,4 +1,5 @@
 <p-toast></p-toast>
+<p-confirmdialog></p-confirmdialog>
 
 <div class="settings-container animate-fadein">
     <div class="flex align-items-center justify-content-between mb-5">
@@ -43,6 +44,27 @@
                             <label for="name">Nombre Comercial</label>
                             <input pInputText id="name" [(ngModel)]="orgData().name" placeholder="Ej: Omni Core" />
                             <small class="helper-text">Este nombre se utilizará en las comunicaciones con tus clientes.</small>
+                        </div>
+
+                        <div class="field mt-4">
+                            <label class="font-bold mb-2 block">Logo de la Empresa (Opcional)</label>
+                            <div class="flex align-items-center gap-4">
+                                <!-- Logo Preview -->
+                                <div class="relative flex align-items-center justify-content-center border-round-xl overflow-hidden surface-100 border-1 surface-border" style="width: 100px; height: 100px;">
+                                    @if (orgData().logoUrl) {
+                                        <img [src]="orgData().logoUrl" alt="Logo de la Empresa" class="w-full h-full object-cover" />
+                                        <button pButton icon="pi pi-times" class="p-button-rounded p-button-danger p-button-xs absolute top-0 right-0 m-1" style="width: 24px; height: 24px; min-width: 24px; padding: 0; display: flex; align-items: center; justify-content: center;" pTooltip="Quitar Logo" (click)="removeLogo()"></button>
+                                    } @else {
+                                        <i class="pi pi-image text-3xl text-400"></i>
+                                    }
+                                </div>
+                                <!-- Upload Button -->
+                                <div class="flex flex-column gap-2">
+                                    <button pButton type="button" icon="pi pi-upload" label="Subir Logo" class="p-button-outlined border-round-lg" (click)="logoInput.click()" [loading]="isUploadingLogo"></button>
+                                    <input #logoInput type="file" (change)="onLogoUpload($event)" accept="image/*" style="display: none" />
+                                    <small class="text-secondary">Formatos permitidos: PNG, JPG, WebP. Máx. 2MB.</small>
+                                </div>
+                            </div>
                         </div>
 
                         <p-divider class="my-5"></p-divider>
