@@ -12,6 +12,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { PromptsService, Prompt } from '../../../core/services/prompts.service';
+import { TemplatesService } from '../../../core/services/templates.service';
 
 @Component({
   selector: 'app-prompts',
@@ -36,6 +37,7 @@ import { PromptsService, Prompt } from '../../../core/services/prompts.service';
 })
 export class Prompts implements OnInit {
   private promptsService = inject(PromptsService);
+  private templatesService = inject(TemplatesService);
   private fb = inject(FormBuilder);
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
@@ -80,6 +82,29 @@ export class Prompts implements OnInit {
 
   ngOnInit() {
     this.loadPrompts();
+    this.loadTemplatesForVariables();
+  }
+
+  loadTemplatesForVariables() {
+    this.templatesService.findAll().subscribe({
+      next: (data) => {
+        // Reset base variables to avoid duplicates on re-entry
+        this.availableVariables = [
+          { label: 'Categorías Catálogo', syntax: '{{categorias}}' },
+          { label: 'Instrucción Catálogo', syntax: '{{productos}}' },
+          { label: 'Dirección Sucursales', syntax: '{{locales}}' },
+          { label: 'Puntos de Encuentro', syntax: '{{encuentros}}' }
+        ];
+        
+        const activeTemplates = data.filter(t => t.isActive);
+        activeTemplates.forEach(t => {
+          this.availableVariables.push({
+            label: `Plantilla: ${t.name}`,
+            syntax: `{{${t.name}}}`
+          });
+        });
+      }
+    });
   }
 
   loadPrompts() {

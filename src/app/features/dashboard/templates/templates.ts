@@ -236,10 +236,16 @@ export class Templates implements OnInit {
 
   availableVariables = [
     { label: 'Nombre Cliente', syntax: '{{cliente}}' },
-    { label: 'Productos', syntax: '{{productos}}' },
+    { label: 'Ciudad Cliente', syntax: '{{ciudad}}' },
+    { label: 'Dirección Cliente', syntax: '{{direccion}}' },
+    { label: 'Teléfono Cliente', syntax: '{{telefono}}' },
+    { label: 'Productos (Resumen)', syntax: '{{productos}}' },
     { label: 'Total Pagar', syntax: '{{total}}' },
     { label: 'Costo Delivery', syntax: '{{costo_envio}}' },
-    { label: 'Ubicación / Sucursal', syntax: '{{ubicacion}}' }
+    { label: 'Ubicación / Sucursal', syntax: '{{ubicacion}}' },
+    { label: 'Nombre de Producto', syntax: '{{nombre_producto}}' },
+    { label: 'Precio de Producto', syntax: '{{precio_producto}}' },
+    { label: 'Descripción Producto', syntax: '{{descripcion_producto}}' }
   ];
 
   readonly placeholderText = 'Hola {{cliente}},\n\nTu pedido ha sido registrado:\n{{productos}}\n\nCosto Delivery: {{costo_envio}}\nTotal a Pagar: {{total}}...';
@@ -315,10 +321,16 @@ export class Templates implements OnInit {
 
     const varMap: { [key: string]: string } = {
       '{{cliente}}': 'Nombre Cliente',
-      '{{productos}}': 'Productos',
+      '{{ciudad}}': 'Ciudad Cliente',
+      '{{direccion}}': 'Dirección Cliente',
+      '{{telefono}}': 'Teléfono Cliente',
+      '{{productos}}': 'Productos (Resumen)',
       '{{total}}': 'Total Pagar',
       '{{costo_envio}}': 'Costo Delivery',
-      '{{ubicacion}}': 'Ubicación / Sucursal'
+      '{{ubicacion}}': 'Ubicación / Sucursal',
+      '{{nombre_producto}}': 'Nombre de Producto',
+      '{{precio_producto}}': 'Precio de Producto',
+      '{{descripcion_producto}}': 'Descripción Producto'
     };
 
     Object.keys(varMap).forEach(syntax => {
@@ -371,10 +383,16 @@ export class Templates implements OnInit {
 
     const varMap: { [key: string]: string } = {
       '{{cliente}}': 'Nombre Cliente',
-      '{{productos}}': 'Productos',
+      '{{ciudad}}': 'Ciudad Cliente',
+      '{{direccion}}': 'Dirección Cliente',
+      '{{telefono}}': 'Teléfono Cliente',
+      '{{productos}}': 'Productos (Resumen)',
       '{{total}}': 'Total Pagar',
       '{{costo_envio}}': 'Costo Delivery',
-      '{{ubicacion}}': 'Ubicación / Sucursal'
+      '{{ubicacion}}': 'Ubicación / Sucursal',
+      '{{nombre_producto}}': 'Nombre de Producto',
+      '{{precio_producto}}': 'Precio de Producto',
+      '{{descripcion_producto}}': 'Descripción Producto'
     };
     const label = varMap[syntax] || syntax;
 
@@ -457,10 +475,16 @@ export class Templates implements OnInit {
 
     const varMap: { [key: string]: string } = {
       '{{cliente}}': 'Nombre Cliente',
-      '{{productos}}': 'Productos',
+      '{{ciudad}}': 'Ciudad Cliente',
+      '{{direccion}}': 'Dirección Cliente',
+      '{{telefono}}': 'Teléfono Cliente',
+      '{{productos}}': 'Productos (Resumen)',
       '{{total}}': 'Total Pagar',
       '{{costo_envio}}': 'Costo Delivery',
-      '{{ubicacion}}': 'Ubicación / Sucursal'
+      '{{ubicacion}}': 'Ubicación / Sucursal',
+      '{{nombre_producto}}': 'Nombre de Producto',
+      '{{precio_producto}}': 'Precio de Producto',
+      '{{descripcion_producto}}': 'Descripción Producto'
     };
     const label = varMap[syntax] || syntax;
 
@@ -565,9 +589,15 @@ export class Templates implements OnInit {
     // Replace variables with friendly mock values for preview
     return content
       .replace(/\{\{cliente\}\}/g, 'Juan Perez')
+      .replace(/\{\{ciudad\}\}/g, 'Santa Cruz')
+      .replace(/\{\{direccion\}\}/g, 'Calle 4 Oeste #123')
+      .replace(/\{\{telefono\}\}/g, '+591 70000000')
       .replace(/\{\{productos\}\}/g, '1x Hamburguesa Clásica (25 Bs)\n1x Coca Cola (7 Bs)')
       .replace(/\{\{total\}\}/g, '42 Bs')
       .replace(/\{\{costo_envio\}\}/g, '10 Bs')
-      .replace(/\{\{ubicacion\}\}/g, 'Av. Banzer y 3er Anillo (Santa Cruz)');
+      .replace(/\{\{ubicacion\}\}/g, 'Av. Banzer y 3er Anillo (Santa Cruz)')
+      .replace(/\{\{nombre_producto\}\}/g, 'Hamburguesa Clásica')
+      .replace(/\{\{precio_producto\}\}/g, '25 Bs')
+      .replace(/\{\{descripcion_producto\}\}/g, 'Deliciosa carne de res con queso y vegetales frescos');
   }
 }
