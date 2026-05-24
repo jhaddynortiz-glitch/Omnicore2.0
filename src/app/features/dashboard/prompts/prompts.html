@@ -75,15 +75,31 @@
         <div class="field mb-4">
             <label for="content" class="font-bold block mb-2">Contenido (Instrucciones del Sistema)</label>
             
-            <div class="flex flex-column gap-2 p-3 border-round-lg border-1 surface-border bg-black-alpha-10 mb-3 shadow-1">
-                <span class="font-bold text-xs text-900 block"><i class="pi pi-info-circle mr-1 text-primary"></i> Variables disponibles (Haz clic para insertar):</span>
-                <div class="flex flex-wrap gap-2 mt-1">
-                    @for (v of availableVariables; track v.syntax) {
-                        <span class="variable-tag shadow-1" (click)="insertVariable(v.syntax)" [pTooltip]="'Insertar ' + v.syntax">
-                            {{v.syntax}} ({{v.label}})
-                        </span>
-                    }
+            <div class="flex flex-column gap-3 p-3 border-round-lg border-1 surface-border bg-black-alpha-10 mb-3 shadow-1">
+                <div>
+                    <span class="font-bold text-xs text-900 block mb-2"><i class="pi pi-cog mr-1 text-primary"></i> Variables del Sistema:</span>
+                    <div class="flex flex-wrap gap-2">
+                        @for (v of systemVariables; track v.syntax) {
+                            <span class="variable-tag shadow-1" (click)="insertVariable(v.syntax)" [pTooltip]="v.label">
+                                {{v.syntax}}
+                            </span>
+                        }
+                    </div>
                 </div>
+
+                @if (templateVariables().length > 0) {
+                    <p-divider styleClass="my-1"></p-divider>
+                    <div>
+                        <span class="font-bold text-xs text-900 block mb-2"><i class="pi pi-envelope mr-1 text-primary"></i> Plantillas Dinámicas:</span>
+                        <div class="flex flex-wrap gap-2">
+                            @for (v of templateVariables(); track v.syntax) {
+                                <span class="variable-tag shadow-1" (click)="insertVariable(v.syntax)" [pTooltip]="v.label" style="background-color: var(--blue-500);">
+                                    {{v.syntax}}
+                                </span>
+                            }
+                        </div>
+                    </div>
+                }
             </div>
 
             <textarea pTextarea id="content" formControlName="content" rows="10" 

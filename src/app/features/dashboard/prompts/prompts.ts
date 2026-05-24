@@ -10,6 +10,7 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
+import { DividerModule } from 'primeng/divider';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { PromptsService, Prompt } from '../../../core/services/prompts.service';
 import { TemplatesService } from '../../../core/services/templates.service';
@@ -29,7 +30,8 @@ import { TemplatesService } from '../../../core/services/templates.service';
     ToggleSwitchModule,
     ToastModule,
     ConfirmDialogModule,
-    TooltipModule
+    TooltipModule,
+    DividerModule
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './prompts.html',
@@ -55,12 +57,14 @@ export class Prompts implements OnInit {
   isEditing = signal(false);
   saving = signal(false);
 
-  availableVariables = [
+  systemVariables = [
     { label: 'Categorías Catálogo', syntax: '{{categorias}}' },
     { label: 'Instrucción Catálogo', syntax: '{{productos}}' },
     { label: 'Dirección Sucursales', syntax: '{{locales}}' },
     { label: 'Puntos de Encuentro', syntax: '{{encuentros}}' }
   ];
+
+  templateVariables = signal<{ label: string, syntax: string }[]>([]);
 
   insertVariable(syntax: string) {
     const textarea = document.getElementById('content') as HTMLTextAreaElement;
@@ -88,21 +92,15 @@ export class Prompts implements OnInit {
   loadTemplatesForVariables() {
     this.templatesService.findAll().subscribe({
       next: (data) => {
-        // Reset base variables to avoid duplicates on re-entry
-        this.availableVariables = [
-          { label: 'Categorías Catálogo', syntax: '{{categorias}}' },
-          { label: 'Instrucción Catálogo', syntax: '{{productos}}' },
-          { label: 'Dirección Sucursales', syntax: '{{locales}}' },
-          { label: 'Puntos de Encuentro', syntax: '{{encuentros}}' }
-        ];
-        
         const activeTemplates = data.filter(t => t.isActive);
-        activeTemplates.forEach(t => {
-          this.availableVariables.push({
-            label: `Plantilla: ${t.name}`,
-            syntax: `{{${t.name}}}`
-          });
+        const vars = activeTemplates.map(t => {
+          const snakeCaseName = t.name.toLowerCase().replace(/\s+/g, '_');
+          return {
+            label: `Contenido de la plantilla: ${t.name}`,
+            syntax: `{{${snakeCaseName}}}`
+          };
         });
+        this.templateVariables.set(vars);
       }
     });
   }
