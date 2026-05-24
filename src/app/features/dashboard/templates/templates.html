@@ -59,8 +59,11 @@
         <div class="col-12 md:col-6 flex flex-column gap-3">
             <div class="field">
                 <label class="font-bold mb-2 block">Nombre de la Plantilla*</label>
-                <input pInputText formControlName="name" placeholder="Ej: Nota de Venta" />
-                <small class="text-500 block mt-1">Un nombre interno para identificar este mensaje.</small>
+                <input pInputText formControlName="name" placeholder="Ej: mi_plantilla_1" (input)="onNameInput($event)" />
+                @if (templateForm.get('name')?.touched && templateForm.get('name')?.errors?.['pattern']) {
+                    <small class="p-error block mt-1" style="color: var(--red-500);">El nombre solo puede contener letras, números y guiones bajos (sin espacios).</small>
+                }
+                <small class="text-500 block mt-1">Un nombre único sin espacios para identificar este mensaje en el prompt.</small>
             </div>
 
             <div class="field">

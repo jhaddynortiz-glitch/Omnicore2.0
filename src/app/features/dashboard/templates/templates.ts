@@ -258,10 +258,18 @@ export class Templates implements OnInit {
   private initForm() {
     this.templateForm = this.fb.group({
       id: [''],
-      name: ['', Validators.required],
+      name: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9_ñÑáéíóúÁÉÍÓÚüÜ]+$/)]],
       content: ['', Validators.required],
       isActive: [true]
     });
+  }
+
+  onNameInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    let value = input.value;
+    // Reemplazar espacios por guiones bajos
+    value = value.replace(/\s+/g, '_');
+    this.templateForm.get('name')?.setValue(value, { emitEvent: false });
   }
 
   loadTemplates() {
@@ -566,8 +574,9 @@ export class Templates implements OnInit {
         this.showDialog = false;
         this.loadTemplates();
       },
-      error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al guardar la plantilla' });
+      error: (err) => {
+        const detail = err?.error?.message || 'Error al guardar la plantilla';
+        this.messageService.add({ severity: 'error', summary: 'Error', detail });
       }
     });
   }
