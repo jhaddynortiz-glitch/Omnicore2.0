@@ -143,6 +143,42 @@ import { TemplatesService, Template } from '../../../core/services/templates.ser
       font-style: italic;
       color: #667781;
     }
+    .content-editable-editor {
+      height: 240px;
+      overflow-y: auto;
+      outline: none;
+      white-space: pre-wrap;
+      word-break: break-word;
+      border: 1px solid var(--surface-border);
+      background-color: var(--surface-card);
+      color: var(--text-color);
+      padding: 0.75rem;
+    }
+    .content-editable-editor:empty:before {
+      content: attr(placeholder);
+      color: #848488;
+      font-style: italic;
+      pointer-events: none;
+      display: block;
+    }
+    :host-context(html.app-dark) .content-editable-editor:empty:before {
+      color: #646468;
+    }
+    .variable-chip {
+      background-color: #FF634A; /* Opaline primary color */
+      color: white !important;
+      font-weight: 600;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      margin: 0px 3px;
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.8rem;
+      user-select: none;
+      -webkit-user-drag: none;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+      vertical-align: middle;
+    }
   `]
 })
 export class Templates implements OnInit {
@@ -205,30 +241,132 @@ export class Templates implements OnInit {
       isActive: true
     });
     this.showDialog = true;
+
+    // Populate editor on next tick
+    setTimeout(() => {
+      const editor = document.getElementById('template-content');
+      if (editor) {
+        editor.innerHTML = '';
+      }
+    }, 50);
   }
 
   editTemplate(template: Template) {
     this.isEditing = true;
     this.templateForm.patchValue(template);
     this.showDialog = true;
+
+    // Populate editor on next tick
+    setTimeout(() => {
+      const editor = document.getElementById('template-content');
+      if (editor) {
+        editor.innerHTML = this.textToHtml(template.content);
+      }
+    }, 50);
+  }
+
+  textToHtml(text: string): string {
+    if (!text) return '';
+    
+    let html = text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
+    const varMap: { [key: string]: string } = {
+      '{{cliente}}': 'Nombre Cliente',
+      '{{productos}}': 'Productos',
+      '{{total}}': 'Total Pagar',
+      '{{costo_envio}}': 'Costo Delivery',
+      '{{ubicacion}}': 'Ubicación / Sucursal'
+    };
+
+    Object.keys(varMap).forEach(syntax => {
+      const label = varMap[syntax];
+      const chipHtml = `<span class="variable-chip" contenteditable="false" data-syntax="${syntax}">+ ${label}</span>`;
+      const escapedSyntax = syntax.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+      const regex = new RegExp(escapedSyntax, 'g');
+      html = html.replace(regex, chipHtml);
+    });
+
+    return html;
+  }
+
+  htmlToText(html: string): string {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    return this.traverseNodes(tempDiv);
+  }
+
+  private traverseNodes(node: Node): string {
+    let text = '';
+    for (let i = 0; i < node.childNodes.length; i++) {
+      const child = node.childNodes[i];
+      
+      if (child.nodeType === 3) { // Text Node
+        text += child.nodeValue;
+      } else if (child.nodeType === 1) { // Element Node
+        const element = child as HTMLElement;
+        if (element.classList.contains('variable-chip')) {
+          const syntax = element.getAttribute('data-syntax') || '';
+          text += syntax;
+        } else if (element.tagName === 'BR') {
+          text += '\n';
+        } else {
+          const isBlock = ['DIV', 'P', 'LI'].includes(element.tagName);
+          const childText = this.traverseNodes(element);
+          if (isBlock && text && !text.endsWith('\n')) {
+            text += '\n';
+          }
+          text += childText;
+        }
+      }
+    }
+    return text;
   }
 
   insertVariable(syntax: string) {
-    const textarea = document.getElementById('template-content') as HTMLTextAreaElement;
-    if (!textarea) return;
+    const editor = document.getElementById('template-content');
+    if (!editor) return;
 
-    const startPos = textarea.selectionStart;
-    const endPos = textarea.selectionEnd;
-    const text = this.templateForm.get('content')?.value || '';
-    
-    const newText = text.substring(0, startPos) + syntax + text.substring(endPos, text.length);
-    this.templateForm.patchValue({ content: newText });
+    const varMap: { [key: string]: string } = {
+      '{{cliente}}': 'Nombre Cliente',
+      '{{productos}}': 'Productos',
+      '{{total}}': 'Total Pagar',
+      '{{costo_envio}}': 'Costo Delivery',
+      '{{ubicacion}}': 'Ubicación / Sucursal'
+    };
+    const label = varMap[syntax] || syntax;
 
-    // Focus back and set cursor position
-    setTimeout(() => {
-      textarea.focus();
-      textarea.setSelectionRange(startPos + syntax.length, startPos + syntax.length);
-    }, 50);
+    // Create chip element
+    const chip = document.createElement('span');
+    chip.className = 'variable-chip';
+    chip.contentEditable = 'false';
+    chip.setAttribute('data-syntax', syntax);
+    chip.innerText = `+ ${label}`;
+
+    // Get current selection
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0);
+      
+      if (editor.contains(range.commonAncestorContainer)) {
+        range.deleteContents();
+        range.insertNode(chip);
+        
+        // Move cursor to after the inserted chip
+        range.setStartAfter(chip);
+        range.setEndAfter(chip);
+        selection.removeAllRanges();
+        selection.addRange(range);
+      } else {
+        editor.appendChild(chip);
+      }
+    } else {
+      editor.appendChild(chip);
+    }
+
+    this.updateFormControlFromEditable();
   }
 
   onDragStart(event: DragEvent, syntax: string) {
@@ -240,14 +378,75 @@ export class Templates implements OnInit {
   }
 
   onDrop(event: DragEvent) {
-    // We let the browser insert the text natively at the correct drop cursor position.
-    // We wait a tiny tick for the DOM to update, then update our form control.
-    setTimeout(() => {
-      const textarea = event.target as HTMLTextAreaElement;
-      if (textarea) {
-        this.templateForm.patchValue({ content: textarea.value });
+    // Prevent default browser drop behavior
+    event.preventDefault();
+  }
+
+  onContentEditableInput(event: Event) {
+    this.updateFormControlFromEditable();
+  }
+
+  onContentEditableDrop(event: DragEvent) {
+    event.preventDefault();
+    const syntax = event.dataTransfer?.getData('text/plain');
+    if (!syntax) return;
+
+    const editor = document.getElementById('template-content');
+    if (!editor) return;
+
+    const varMap: { [key: string]: string } = {
+      '{{cliente}}': 'Nombre Cliente',
+      '{{productos}}': 'Productos',
+      '{{total}}': 'Total Pagar',
+      '{{costo_envio}}': 'Costo Delivery',
+      '{{ubicacion}}': 'Ubicación / Sucursal'
+    };
+    const label = varMap[syntax] || syntax;
+
+    // Create chip element
+    const chip = document.createElement('span');
+    chip.className = 'variable-chip';
+    chip.contentEditable = 'false';
+    chip.setAttribute('data-syntax', syntax);
+    chip.innerText = `+ ${label}`;
+
+    let range: Range | null = null;
+    
+    // Find caret range at drop point
+    const doc = document as any;
+    if (doc.caretRangeFromPoint) {
+      range = doc.caretRangeFromPoint(event.clientX, event.clientY);
+    } else if ((event as any).rangeParent) {
+      // Firefox fallback
+      range = document.createRange();
+      range.setStart((event as any).rangeParent, (event as any).rangeOffset);
+      range.setEnd((event as any).rangeParent, (event as any).rangeOffset);
+    }
+
+    if (range && editor.contains(range.commonAncestorContainer)) {
+      range.insertNode(chip);
+      
+      const selection = window.getSelection();
+      if (selection) {
+        range.setStartAfter(chip);
+        range.setEndAfter(chip);
+        selection.removeAllRanges();
+        selection.addRange(range);
       }
-    }, 50);
+    } else {
+      editor.appendChild(chip);
+    }
+
+    this.updateFormControlFromEditable();
+  }
+
+  private updateFormControlFromEditable() {
+    const editor = document.getElementById('template-content');
+    if (editor) {
+      const plainText = this.htmlToText(editor.innerHTML);
+      this.templateForm.get('content')?.setValue(plainText, { emitEvent: true });
+      this.cdr.detectChanges();
+    }
   }
 
   saveTemplate() {
