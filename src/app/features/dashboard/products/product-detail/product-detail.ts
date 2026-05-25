@@ -210,7 +210,7 @@ export class ProductDetail implements OnInit {
         this.productForm.patchValue({
           ...product,
           categoryId: product.Subcategory?.categoryId || '',
-          cardDescription: product.cardDescription || '',
+          cardDescription: product.cardDescription || `*🛍️ {{nombre}}*\n\n📝 {{descripcion}}\n\n💵 *Precio:* {{precio}} {{moneda}}\n\n¿Cuántos te gustaría adquirir?`,
           cardImageUrl: product.cardImageUrl || ''
         } as any);
 
