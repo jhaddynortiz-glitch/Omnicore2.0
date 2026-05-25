@@ -1,5 +1,6 @@
 import { Component, inject, OnInit, signal, HostListener } from '@angular/core';
 import { ChatService, Contact, ChatMessage } from '../../../core/services/chat.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { MenuItem } from 'primeng/api';
 
 import { WebsocketService } from '../../../core/services/websocket.service';
@@ -18,6 +19,7 @@ import { ContactDialog } from './components/contact-dialog';
 export class Chats implements OnInit {
   private chatService = inject(ChatService);
   private wsService = inject(WebsocketService);
+  private authService = inject(AuthService);
 
   contacts = signal<Contact[]>([]);
   isLoading = signal<boolean>(true);
@@ -239,7 +241,33 @@ export class Chats implements OnInit {
       });
     }
 
-    items.push({ label: 'Bloquear número', icon: 'pi pi-ban', className: 'text-red-500', command: () => {} });
+    if (this.authService.isGlobalAdmin()) {
+      items.push({
+        label: 'Reiniciar y limpiar chat',
+        icon: 'pi pi-trash',
+        styleClass: 'text-red-500 font-bold',
+        command: () => {
+          if (confirm('¿Estás seguro de que quieres eliminar todo el historial de este chat? Esto reiniciará por completo la memoria de la IA para este cliente.')) {
+            this.chatService.clearChat(contact.id).subscribe({
+              next: () => {
+                this.activeMessages.set([]);
+                this.contacts.update(list => {
+                  const idx = list.findIndex(c => c.id === contact.id);
+                  if (idx > -1) {
+                    const newList = [...list];
+                    newList[idx] = { ...newList[idx], messages: [] };
+                    return newList;
+                  }
+                  return list;
+                });
+              },
+              error: (err) => console.error('Error al limpiar chat', err)
+            });
+          }
+        }
+      });
+    }
+
     this.chatMenuItems.set(items);
   }
 

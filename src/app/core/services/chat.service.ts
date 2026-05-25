@@ -63,4 +63,8 @@ export class ChatService {
   markAsRead(contactId: string): Observable<any> {
     return this.http.post(`${environment.apiUrl}/whatsapp/contacts/${contactId}/read`, {});
   }
+
+  clearChat(contactId: string): Observable<any> {
+    return this.http.delete(`${environment.apiUrl}/whatsapp/messages/${contactId}`);
+  }
 }
