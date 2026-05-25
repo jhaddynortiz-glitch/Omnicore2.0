@@ -64,10 +64,25 @@ export class Prompts implements OnInit {
 
   templateVariables = signal<{ label: string; syntax: string; description?: string }[]>([]);
 
+  generalVariables = [
+    { label: 'Nombre Cliente', syntax: '{{cliente}}', description: 'Nombre del cliente' },
+    { label: 'Ciudad Cliente', syntax: '{{ciudad}}', description: 'Ciudad del cliente' },
+    { label: 'Dirección Cliente', syntax: '{{direccion}}', description: 'Dirección del cliente' },
+    { label: 'Teléfono Cliente', syntax: '{{telefono}}', description: 'Teléfono del cliente' },
+    { label: 'Total Pagar', syntax: '{{total}}', description: 'Total a pagar' },
+    { label: 'Costo Delivery', syntax: '{{costo_envio}}', description: 'Costo de envío' },
+    { label: 'Ubicación / Sucursal', syntax: '{{ubicacion}}', description: 'Ubicación de sucursal' },
+    { label: 'Nombre de Producto', syntax: '{{nombre_producto}}', description: 'Nombre del producto' },
+    { label: 'Precio de Producto', syntax: '{{precio_producto}}', description: 'Precio del producto' },
+    { label: 'Descripción Producto', syntax: '{{descripcion_producto}}', description: 'Descripción del producto' },
+    { label: 'Card de Producto', syntax: '{{card_producto}}', description: 'Tarjeta de producto' }
+  ];
+
   get allVariablesText(): string {
-    const fixed = this.fixedVariables.map(v => v.syntax);
-    const templates = this.templateVariables().map(t => t.syntax);
-    return [...fixed, ...templates].join(', ');
+    const fixed = this.fixedVariables.map(v => `${v.syntax} (${v.description})`);
+    const general = this.generalVariables.map(v => `${v.syntax} (${v.description})`);
+    const templates = this.templateVariables().map(t => `${t.syntax} (${t.description})`);
+    return [...fixed, ...general, ...templates].join(' | ');
   }
 
   copyAllVariables() {
