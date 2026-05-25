@@ -68,6 +68,10 @@ export const routes: Routes = [
           loadComponent: () => import('./features/dashboard/settings/admin-config/admin-config').then(m => m.AdminConfig)
         },
         {
+          path: 'settings/keyword-config',
+          loadComponent: () => import('./features/dashboard/settings/keyword-config/keyword-config').then(m => m.KeywordConfig)
+        },
+        {
           path: 'orders',
           loadComponent: () => import('./features/dashboard/orders/orders').then(m => m.Orders)
         },

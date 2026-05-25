@@ -1,0 +1,82 @@
+<p-toast></p-toast>
+<p-confirmdialog></p-confirmdialog>
+
+<div class="keyword-config-container animate-fadein">
+  <!-- Back Header -->
+  <div class="flex align-items-center justify-content-between mb-5">
+    <div class="flex align-items-center gap-3">
+      <button pButton icon="pi pi-arrow-left" class="p-button-rounded p-button-text p-button-lg" (click)="goBack()" pTooltip="Volver a Configuración"></button>
+      <div>
+        <h2 class="text-4xl font-bold m-0 gradient-text">Palabras Clave (Auto-respuestas)</h2>
+        <p class="text-secondary mt-2">Configura disparadores para responder automáticamente en los pedidos.</p>
+      </div>
+    </div>
+    <button pButton icon="pi pi-plus" label="Nueva Palabra Clave" class="p-button-rounded shadow-3 px-4 py-3 p-button-primary border-none gradient-btn" (click)="openNew()"></button>
+  </div>
+
+  <!-- Keywords Card -->
+  <p-card styleClass="shadow-4 border-round-xl overflow-hidden backdrop-blur">
+    <p-table [value]="keywords()" [loading]="loading()" styleClass="p-datatable-striped p-datatable-sm" [tableStyle]="{'min-width': '100%'}">
+      <ng-template pTemplate="header">
+        <tr>
+          <th class="py-3 px-4" style="width: 30%">Palabra Clave</th>
+          <th class="py-3 px-4" style="width: 50%">Respuesta Automática</th>
+          <th class="py-3 px-4 text-center" style="width: 20%">Acciones</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-keyword>
+        <tr class="hover:surface-hover transition-all transition-duration-200">
+          <td class="py-3 px-4">
+            <span class="font-bold text-primary">{{keyword.keyword}}</span>
+          </td>
+          <td class="py-3 px-4">
+            <span class="text-700 line-height-3">{{keyword.response}}</span>
+          </td>
+          <td class="py-3 px-4 text-center">
+            <div class="flex justify-content-center gap-2">
+              <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-info" (click)="editKeyword(keyword)" pTooltip="Editar"></button>
+              <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" (click)="deleteKeyword(keyword)" pTooltip="Eliminar"></button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    @if (keywords().length === 0 && !loading()) {
+      <div class="text-center py-6 px-4 surface-card border-round-xl mt-4 border-1 surface-border">
+        <i class="pi pi-bolt text-500 text-6xl mb-4 opacity-50"></i>
+        <h3 class="m-0 text-900 font-bold">No hay palabras clave configuradas</h3>
+        <p class="text-500 text-sm mt-2 max-w-20rem mx-auto">Agrega palabras clave que dispararán respuestas automáticas en los pedidos.</p>
+        <button pButton label="Crear primer disparador" icon="pi pi-plus" class="p-button-outlined border-round-lg mt-4" (click)="openNew()"></button>
+      </div>
+    }
+  </p-card>
+</div>
+
+<!-- ==========================================
+     MODAL: DIALOGO KEYWORD
+     ========================================== -->
+<p-dialog [(visible)]="showDialog" [modal]="true" [header]="isEditing ? 'Editar Palabra Clave' : 'Nueva Palabra Clave'" [style]="{width: '500px'}" styleClass="glass-modal">
+  <div [formGroup]="keywordForm" class="p-fluid grid pt-4">
+    
+    <div class="col-12 field mb-4">
+      <label class="font-bold mb-2 block text-800">Palabra Clave *</label>
+      <input pInputText formControlName="keyword" placeholder="Ej: PROMO, URGENTE" class="p-inputtext-lg border-round-lg font-mono" />
+      <small class="text-secondary mt-1 block">La palabra que se buscará en el texto del pedido o dirección.</small>
+    </div>
+
+    <div class="col-12 field mb-4">
+      <label class="font-bold mb-2 block text-800">Respuesta Automática *</label>
+      <textarea pInputTextarea formControlName="response" rows="4" placeholder="Ej: Tu pedido con la promo ha sido recibido..." class="p-inputtext-lg border-round-lg"></textarea>
+      <small class="text-secondary mt-1 block">El mensaje que se adjuntará automáticamente.</small>
+    </div>
+
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-end gap-3">
+      <button pButton label="Cancelar" class="p-button-text p-button-secondary font-semibold" (click)="showDialog = false"></button>
+      <button pButton label="Guardar" class="p-button-primary border-round-lg px-4 font-semibold shadow-2 gradient-btn border-none" (click)="saveKeyword()" [disabled]="keywordForm.invalid"></button>
+    </div>
+  </ng-template>
+</p-dialog>

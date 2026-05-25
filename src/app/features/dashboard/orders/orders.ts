@@ -90,6 +90,7 @@ export class Orders implements OnInit {
   orders = signal<Order[]>([]);
   loading = signal(false);
   searchQuery = signal('');
+  orderIdSearchQuery = signal('');
 
   selectedStatusFilter = signal<string>('ALL');
   selectedCityFilter = signal<string>('ALL');
@@ -246,10 +247,14 @@ export class Orders implements OnInit {
       list = list.filter(o => 
         (o.Contact?.name || '').toLowerCase().includes(query) ||
         (o.Contact?.phoneNumber || '').toLowerCase().includes(query) ||
-        (o.id || '').toLowerCase().includes(query) ||
         (o.shippingAddress || '').toLowerCase().includes(query) ||
         (o.items || []).some(item => (item.Product?.name || '').toLowerCase().includes(query))
       );
+    }
+
+    const orderIdQuery = this.orderIdSearchQuery().toLowerCase().trim();
+    if (orderIdQuery) {
+      list = list.filter(o => (o.id || '').toLowerCase().includes(orderIdQuery));
     }
 
     return list;

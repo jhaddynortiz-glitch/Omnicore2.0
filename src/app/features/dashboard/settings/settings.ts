@@ -832,5 +832,9 @@ export class Settings implements OnInit {
   goToDedicatedPage() {
     this.router.navigate(['/dashboard/settings/admin-config']);
   }
+
+  goToKeywordsPage() {
+    this.router.navigate(['/dashboard/settings/keyword-config']);
+  }
 }
 

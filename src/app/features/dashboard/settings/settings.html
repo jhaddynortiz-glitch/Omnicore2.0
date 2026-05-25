@@ -32,6 +32,10 @@
                     <i class="pi pi-phone mr-2"></i>
                     <span>Contactos de Operación</span>
                 </p-tab>
+                <p-tab value="5">
+                    <i class="pi pi-bolt mr-2"></i>
+                    <span>Palabras Clave</span>
+                </p-tab>
             </p-tablist>
 
             <p-tabpanels>
@@ -367,6 +371,14 @@
                                 <p class="text-500 text-sm mt-1">Registra administradores o repartidores para habilitar notificaciones y logística.</p>
                             </div>
                         }
+                    </div>
+                <!-- PESTAÑA 5: PALABRAS CLAVE -->
+                <p-tabpanel value="5">
+                    <div class="pt-4 text-center pb-6">
+                        <i class="pi pi-bolt text-primary text-6xl mb-4"></i>
+                        <h3 class="text-2xl font-bold m-0">Palabras Clave y Auto-respuestas</h3>
+                        <p class="text-secondary mt-2 mb-4 max-w-30rem mx-auto">Configura disparadores en los pedidos para generar respuestas y alertas de forma automática al recibir mensajes de clientes.</p>
+                        <button pButton label="Gestionar Palabras Clave" icon="pi pi-external-link" class="p-button-rounded p-button-primary p-button-lg px-5 shadow-2 gradient-btn border-none" (click)="goToKeywordsPage()"></button>
                     </div>
                 </p-tabpanel>
             </p-tabpanels>
