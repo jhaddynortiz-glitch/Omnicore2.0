@@ -64,6 +64,10 @@ export const routes: Routes = [
           loadComponent: () => import('./features/dashboard/settings/settings').then(m => m.Settings)
         },
         {
+          path: 'settings/admin-config',
+          loadComponent: () => import('./features/dashboard/settings/admin-config/admin-config').then(m => m.AdminConfig)
+        },
+        {
           path: 'orders',
           loadComponent: () => import('./features/dashboard/orders/orders').then(m => m.Orders)
         },

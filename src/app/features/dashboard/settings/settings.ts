@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -125,6 +126,7 @@ export class Settings implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private operationContactsService = inject(OperationContactsService);
   private usersService = inject(UsersService);
+  private router = inject(Router);
 
   // Operation Contacts
   operationContacts = signal<OperationContact[]>([]);
@@ -826,4 +828,9 @@ export class Settings implements OnInit {
       }
     });
   }
+
+  goToDedicatedPage() {
+    this.router.navigate(['/dashboard/settings/admin-config']);
+  }
 }
+

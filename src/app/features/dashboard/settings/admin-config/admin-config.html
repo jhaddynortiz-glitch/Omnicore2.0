@@ -1,0 +1,111 @@
+<p-toast></p-toast>
+<p-confirmdialog></p-confirmdialog>
+
+<div class="admin-config-container animate-fadein">
+  <!-- Back Header -->
+  <div class="flex align-items-center justify-content-between mb-5">
+    <div class="flex align-items-center gap-3">
+      <button pButton icon="pi pi-arrow-left" class="p-button-rounded p-button-text p-button-lg" (click)="goBack()" pTooltip="Volver a Configuración"></button>
+      <div>
+        <h2 class="text-4xl font-bold m-0 gradient-text">Contactos Operativos (Admin / Delivery)</h2>
+        <p class="text-secondary mt-2">Gestiona de forma centralizada los números telefónicos para alertas del sistema y asignación de pedidos.</p>
+      </div>
+    </div>
+    <button pButton icon="pi pi-plus" label="Nuevo Contacto" class="p-button-rounded shadow-3 px-4 py-3 p-button-primary border-none gradient-btn" (click)="openNew()"></button>
+  </div>
+
+  <!-- Contacts Card -->
+  <p-card styleClass="shadow-4 border-round-xl overflow-hidden backdrop-blur">
+    <p-table [value]="contacts()" [loading]="loading()" styleClass="p-datatable-striped p-datatable-sm" [tableStyle]="{'min-width': '100%'}">
+      <ng-template pTemplate="header">
+        <tr>
+          <th class="py-3 px-4">Nombre Completo</th>
+          <th class="py-3 px-4">Número de WhatsApp</th>
+          <th class="py-3 px-4">Rol Operativo</th>
+          <th class="py-3 px-4">Usuario del Sistema</th>
+          <th class="py-3 px-4 text-center" style="width: 150px">Acciones</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-contact>
+        <tr class="hover:surface-hover transition-all transition-duration-200">
+          <td class="py-3 px-4">
+            <span class="font-bold text-900">{{contact.name}}</span>
+          </td>
+          <td class="py-3 px-4">
+            <span class="flex align-items-center text-700">
+              <i class="pi pi-whatsapp text-green-500 mr-2 text-lg"></i>
+              <strong class="font-mono">{{contact.phoneNumber}}</strong>
+            </span>
+          </td>
+          <td class="py-3 px-4">
+            @if (contact.type === 'ADMIN') {
+              <span class="p-tag p-tag-rounded p-tag-danger px-3 py-1 text-xs">Administrador</span>
+            } @else {
+              <span class="p-tag p-tag-rounded p-tag-warning px-3 py-1 text-xs">Repartidor</span>
+            }
+          </td>
+          <td class="py-3 px-4 text-sm text-600">
+            @if (contact.User) {
+              <span class="font-semibold">{{contact.User.fullName}}</span> <span class="text-500">({{contact.User.email}})</span>
+            } @else {
+              <span class="text-400 italic">Ninguno</span>
+            }
+          </td>
+          <td class="py-3 px-4 text-center">
+            <div class="flex justify-content-center gap-2">
+              <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-info" (click)="editContact(contact)" pTooltip="Editar"></button>
+              <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" (click)="deleteContact(contact)" pTooltip="Eliminar"></button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    @if (contacts().length === 0 && !loading()) {
+      <div class="text-center py-6 px-4 surface-card border-round-xl mt-4 border-1 surface-border">
+        <i class="pi pi-users text-500 text-6xl mb-4 opacity-50"></i>
+        <h3 class="m-0 text-900 font-bold">No hay contactos configurados</h3>
+        <p class="text-500 text-sm mt-2 max-w-20rem mx-auto">Comienza agregando administradores para recibir alertas o repartidores para coordinar entregas.</p>
+        <button pButton label="Crear primer contacto" icon="pi pi-plus" class="p-button-outlined border-round-lg mt-4" (click)="openNew()"></button>
+      </div>
+    }
+  </p-card>
+</div>
+
+<!-- ==========================================
+     MODAL: DIALOGO CONTACTO
+     ========================================== -->
+<p-dialog [(visible)]="showDialog" [modal]="true" [header]="isEditing ? 'Editar Contacto' : 'Nuevo Contacto'" [style]="{width: '500px'}" styleClass="glass-modal">
+  <div [formGroup]="contactForm" class="p-fluid grid pt-4">
+    
+    <div class="col-12 field mb-4">
+      <label class="font-bold mb-2 block text-800">Nombre Completo *</label>
+      <input pInputText formControlName="name" placeholder="Ej: Ronald Justiniano" class="p-inputtext-lg border-round-lg" />
+    </div>
+
+    <div class="col-12 field mb-4">
+      <label class="font-bold mb-2 block text-800">Número de WhatsApp *</label>
+      <input pInputText formControlName="phoneNumber" placeholder="Ej: +59170012345" class="p-inputtext-lg border-round-lg font-mono" />
+      <small class="text-secondary mt-1 block">Incluye el código internacional del país (ej: +591 para Bolivia).</small>
+    </div>
+
+    <div class="col-12 field mb-4">
+      <label class="font-bold mb-2 block text-800">Tipo de Contacto *</label>
+      <p-select [options]="contactTypes" optionLabel="label" optionValue="value" formControlName="type" placeholder="Seleccionar Tipo" styleClass="border-round-lg"></p-select>
+    </div>
+
+    <div class="col-12 field mb-4">
+      <label class="font-bold mb-2 block text-800">Vincular a Usuario del Sistema (Opcional)</label>
+      <p-select [options]="orgMembers()" optionLabel="fullName" optionValue="id" formControlName="userId" [showClear]="true" placeholder="Ninguno / Sin usuario asignado" styleClass="border-round-lg"></p-select>
+      <small class="text-secondary mt-1 block">Asocia este contacto con un usuario para otorgarle acceso a su panel personal.</small>
+    </div>
+
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-end gap-3">
+      <button pButton label="Cancelar" class="p-button-text p-button-secondary font-semibold" (click)="showDialog = false"></button>
+      <button pButton label="Guardar Contacto" class="p-button-primary border-round-lg px-4 font-semibold shadow-2 gradient-btn border-none" (click)="saveContact()" [disabled]="contactForm.invalid"></button>
+    </div>
+  </ng-template>
+</p-dialog>

@@ -40,4 +40,12 @@ export class OperationContactsService {
   deleteContact(id: string): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/${id}`);
   }
+
+  getConfigContacts(): Observable<OperationContact[]> {
+    return this.http.get<OperationContact[]>(`${environment.apiUrl}/config/contacts`);
+  }
+
+  updateConfigContacts(contacts: OperationContact[]): Observable<OperationContact[]> {
+    return this.http.put<OperationContact[]>(`${environment.apiUrl}/config/contacts`, contacts);
+  }
 }

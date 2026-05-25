@@ -317,7 +317,10 @@
                                 <h3 class="text-xl font-bold m-0">Contactos de Operación</h3>
                                 <p class="text-secondary m-0">Configura los números de administradores (alertas de pedidos) y repartidores (asignación de entregas).</p>
                             </div>
-                            <button pButton icon="pi pi-plus" label="Nuevo Contacto" class="p-button-rounded shadow-2" (click)="openNewContact()"></button>
+                            <div class="flex gap-2">
+                                <button pButton icon="pi pi-external-link" label="Ver Página Dedicada" class="p-button-outlined p-button-secondary p-button-rounded" (click)="goToDedicatedPage()"></button>
+                                <button pButton icon="pi pi-plus" label="Nuevo Contacto" class="p-button-rounded shadow-2" (click)="openNewContact()"></button>
+                            </div>
                         </div>
 
                         <p-table [value]="operationContacts()" styleClass="p-datatable-sm shadow-1 border-round-xl border-1 surface-border" [tableStyle]="{'min-width': '100%'}">
