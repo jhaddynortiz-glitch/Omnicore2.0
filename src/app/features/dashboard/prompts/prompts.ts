@@ -62,7 +62,7 @@ export class Prompts implements OnInit {
     { label: 'Puntos de Encuentro', syntax: '{{encuentros}}', description: 'Lista de puntos de encuentro configurados para entregas.' }
   ];
 
-  templateVariables = signal<{ label: string; syntax: string }[]>([]);
+  templateVariables = signal<{ label: string; syntax: string; description?: string }[]>([]);
 
   get allVariablesText(): string {
     const fixed = this.fixedVariables.map(v => v.syntax);
