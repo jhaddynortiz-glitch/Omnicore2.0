@@ -245,7 +245,8 @@ export class Templates implements OnInit {
     { label: 'Ubicación / Sucursal', syntax: '{{ubicacion}}' },
     { label: 'Nombre de Producto', syntax: '{{nombre_producto}}' },
     { label: 'Precio de Producto', syntax: '{{precio_producto}}' },
-    { label: 'Descripción Producto', syntax: '{{descripcion_producto}}' }
+    { label: 'Descripción Producto', syntax: '{{descripcion_producto}}' },
+    { label: 'Card de Producto', syntax: '{{card_producto}}' }
   ];
 
   readonly placeholderText = 'Hola {{cliente}},\n\nTu pedido ha sido registrado:\n{{productos}}\n\nCosto Delivery: {{costo_envio}}\nTotal a Pagar: {{total}}...';

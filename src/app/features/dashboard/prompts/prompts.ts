@@ -56,10 +56,10 @@ export class Prompts implements OnInit {
   saving = signal(false);
 
   fixedVariables = [
-    { label: 'Categorías Catálogo', syntax: '{{categorias}}' },
-    { label: 'Instrucción Catálogo', syntax: '{{productos}}' },
-    { label: 'Dirección Sucursales', syntax: '{{locales}}' },
-    { label: 'Puntos de Encuentro', syntax: '{{encuentros}}' }
+    { label: 'Categorías Catálogo', syntax: '{{categorias}}', description: 'Lista de categorías de productos disponibles.' },
+    { label: 'Instrucción Catálogo', syntax: '{{productos}}', description: 'Instrucción para que la IA sepa cómo consultar productos.' },
+    { label: 'Dirección Sucursales', syntax: '{{locales}}', description: 'Lista de todas las ubicaciones físicas de las tiendas.' },
+    { label: 'Puntos de Encuentro', syntax: '{{encuentros}}', description: 'Lista de puntos de encuentro configurados para entregas.' }
   ];
 
   templateVariables = signal<{ label: string; syntax: string }[]>([]);
@@ -95,7 +95,8 @@ export class Prompts implements OnInit {
         const activeTemplates = data.filter(t => t.isActive);
         const vars = activeTemplates.map(t => ({
           label: t.name,
-          syntax: `{{${t.name}}}`
+          syntax: `{{${t.name}}}`,
+          description: `Inserta la plantilla: ${t.name}`
         }));
         this.templateVariables.set(vars);
       }

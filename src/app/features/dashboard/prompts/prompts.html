@@ -86,6 +86,24 @@
                             pTooltip="Copiar todas al portapapeles" (click)="copyAllVariables()"></button>
                 </div>
             </div>
+            
+            <div class="variables-list mb-3 surface-card border-1 surface-border border-round p-3" style="max-height: 200px; overflow-y: auto;">
+                <p class="text-sm text-600 mb-2 font-bold">Variables disponibles:</p>
+                <div class="flex flex-column gap-2">
+                    @for (v of fixedVariables; track v.syntax) {
+                        <div class="flex flex-column">
+                            <span class="text-sm font-semibold" style="color: var(--primary-color);">{{v.syntax}}</span>
+                            <span class="text-xs text-600">{{v.description}}</span>
+                        </div>
+                    }
+                    @for (v of templateVariables(); track v.syntax) {
+                        <div class="flex flex-column">
+                            <span class="text-sm font-semibold" style="color: var(--primary-color);">{{v.syntax}}</span>
+                            <span class="text-xs text-600">{{v.description}}</span>
+                        </div>
+                    }
+                </div>
+            </div>
 
             <textarea pTextarea id="content" formControlName="content" rows="10" 
                 class="prompt-textarea w-full"
